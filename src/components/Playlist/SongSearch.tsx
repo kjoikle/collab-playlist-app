@@ -18,8 +18,8 @@ const SongSearch: React.FC<SongSearchProps> = ({ addSong }) => {
 
   const handleSongClick = (song: Song) => {
     addSong(song);
-    setQuery(""); // Clear input after adding song
-    setResults([]); // Clear results after adding song
+    setQuery("");
+    setResults([]);
   };
 
   useEffect(() => {
