@@ -4,5 +4,6 @@ export type Song = {
   album: string;
   coverImage: string;
   spotifyUrl: string;
-  isrc?: string; // international standard song ID
+  isrc: string;
+  spotifyUri: string;
 };
