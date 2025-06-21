@@ -22,6 +22,8 @@ export async function GET(req: Request) {
 
   const data = await res.json();
 
+  console.log("Spotify search results:", data.tracks.items);
+
   const results = data.tracks.items.map((item: any) => ({
     title: item.name,
     artist: item.artists.map((a: any) => a.name).join(", "),
@@ -29,6 +31,7 @@ export async function GET(req: Request) {
     coverImage: item.album.images[0]?.url,
     spotifyUrl: item.external_urls.spotify,
     isrc: item.external_ids?.isrc,
+    spotifyUri: item.uri,
   }));
 
   return Response.json(results);
