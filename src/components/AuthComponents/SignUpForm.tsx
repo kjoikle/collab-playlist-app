@@ -11,17 +11,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SpotifyLoginButton from "./SpotifyLoginButton";
-import { login } from "./actions";
+import { signup } from "./actions";
 
-const LoginForm: React.FC = () => {
+const SignUpForm: React.FC = () => {
   return (
     <div
       className={cn("flex flex-col gap-6 w-full md:w-1/2 sm:w-3/4 lg:w-1/3")}
     >
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>Login with your Spotify account</CardDescription>
+          <CardTitle className="text-xl">Welcome</CardTitle>
+          <CardDescription>Sign up with your Spotify account</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6">
@@ -33,11 +33,11 @@ const LoginForm: React.FC = () => {
                 Or continue with
               </span>
             </div>
-            <form className="grid gap-6" action={login}>
+            <form className="grid gap-6" action={signup}>
               <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="signup-email">Email</Label>
                 <Input
-                  id="email"
+                  id="signup-email"
                   name="email"
                   type="email"
                   placeholder="m@example.com"
@@ -45,25 +45,22 @@ const LoginForm: React.FC = () => {
                 />
               </div>
               <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input id="password" name="password" type="password" required />
+                <Label htmlFor="signup-password">Password</Label>
+                <Input
+                  id="signup-password"
+                  name="password"
+                  type="password"
+                  required
+                />
               </div>
               <Button type="submit" className="w-full">
-                Login
+                Sign Up
               </Button>
             </form>
             <div className="text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <a href="/login/signup" className="underline underline-offset-4">
-                Sign up
+              Already have an account?{" "}
+              <a href="/login" className="underline underline-offset-4">
+                Log in
               </a>
             </div>
           </div>
@@ -73,4 +70,4 @@ const LoginForm: React.FC = () => {
   );
 };
 
-export default LoginForm;
+export default SignUpForm;

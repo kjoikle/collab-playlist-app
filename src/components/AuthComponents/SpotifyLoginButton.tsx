@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -9,7 +11,7 @@ const SpotifyLoginButton = () => {
   const loginWithSpotify = async () => {
     const supabase = createClient();
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "spotify",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
@@ -20,9 +22,8 @@ const SpotifyLoginButton = () => {
     if (error) {
       alert("Spotify Login error: " + error.message);
     }
-
-    console.log("Spotify Login data:", data);
   };
+
   return (
     <Button variant="outline" className="w-full" onClick={loginWithSpotify}>
       <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

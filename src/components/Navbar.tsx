@@ -34,7 +34,9 @@ const Navbar = () => {
     <>
       <nav className="p-3 pb-4 items-center w-full fixed top-0 z-50 transition-colors duration-300 pr-5">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-gray-800">Project Meow</div>
+          <a href="/dashboard">
+            <div className="text-2xl font-bold text-gray-800">Project Meow</div>
+          </a>
           <div className="space-x-4">
             {/* <a href="/" className="text-gray-600 hover:text-gray-900">
               Home

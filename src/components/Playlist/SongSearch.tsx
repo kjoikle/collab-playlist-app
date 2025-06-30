@@ -37,7 +37,7 @@ const SongSearch: React.FC<SongSearchProps> = ({ addSong }) => {
   }, [query]);
 
   return (
-    <div className="max-w-md mt-10 flex flex-col mx-auto px-4">
+    <div className="max-w-full mt-10 flex flex-col">
       <input
         type="text"
         placeholder="Enter song name"

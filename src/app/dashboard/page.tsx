@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import PlaylistCreate from "@/components/Playlist/PlaylistCreate";
+import PlaylistsDisplay from "@/components/Dashboard/PlaylistsDisplay";
 
 const Dashboard = async () => {
   const supabase = await createClient();
@@ -16,7 +16,8 @@ const Dashboard = async () => {
         Welcome to Project Meow
       </h1>
       <p className="text-center mt-4">Collaborative Playlist Maker</p>
-      <PlaylistCreate />
+
+      <PlaylistsDisplay />
     </div>
   );
 };
