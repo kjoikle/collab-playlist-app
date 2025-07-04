@@ -1,7 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
 import PlaylistsDisplay from "@/components/Dashboard/PlaylistsDisplay";
+import { getUserPlaylists } from "./actions";
+import { Playlist } from "@/types/types";
 
 const Dashboard = async () => {
+  const playlists: Playlist[] = (await getUserPlaylists()) ?? [];
+
   return (
     <div>
       <h1 className="text-4xl font-bold text-center mt-10">
@@ -9,7 +12,7 @@ const Dashboard = async () => {
       </h1>
       <p className="text-center mt-4">Collaborative Playlist Maker</p>
 
-      <PlaylistsDisplay />
+      <PlaylistsDisplay playlists={playlists} />
     </div>
   );
 };

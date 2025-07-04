@@ -6,26 +6,30 @@ interface EditPlaylistHeaderProps {
     description: string,
     collaborative: boolean,
     isPublic: boolean
-  ) => Promise<void>;
+  ) => void;
 
-  handleSave: (title: string, description: string) => Promise<void>;
+  handleSave: (title: string, description: string) => void;
 }
 
 const EditPlaylistHeader: React.FC<EditPlaylistHeaderProps> = ({
   handleExport,
   handleSave,
 }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [isPublic, setIsPublic] = useState(true);
-  const [collaborative, setCollaborative] = useState(false);
-
-  const onExport = () => {
-    handleExport(title, description, collaborative, isPublic);
-  };
-
-  const onSave = () => {
-    handleSave(title, description);
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
+    const isPublic = formData.get("isPublic") === "on";
+    const collaborative = formData.get("collaborative") === "on";
+    if (
+      (e.nativeEvent as SubmitEvent).submitter?.getAttribute("name") ===
+      "export"
+    ) {
+      await handleExport(title, description, collaborative, isPublic);
+    } else {
+      await handleSave(title, description);
+    }
   };
 
   return (
@@ -34,19 +38,21 @@ const EditPlaylistHeader: React.FC<EditPlaylistHeaderProps> = ({
         Create Your Playlist
       </h1>
       <div className="flex justify-center mb-4">
-        <div className="flex flex-1 flex-col justify-between">
+        <form
+          className="flex flex-1 flex-col justify-between"
+          onSubmit={onSubmit}
+        >
           <div className="flex flex-col gap-2 mb-2">
             <input
               type="text"
+              name="title"
               placeholder="Playlist Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
               className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-blue-500"
+              required
             />
             <textarea
+              name="description"
               placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-blue-500 resize-none"
               rows={2}
             />
@@ -55,8 +61,8 @@ const EditPlaylistHeader: React.FC<EditPlaylistHeaderProps> = ({
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={isPublic}
-                onChange={(e) => setIsPublic(e.target.checked)}
+                name="isPublic"
+                defaultChecked
                 className="form-checkbox"
               />
               <span>Public</span>
@@ -64,26 +70,27 @@ const EditPlaylistHeader: React.FC<EditPlaylistHeaderProps> = ({
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={collaborative}
-                onChange={(e) => setCollaborative(e.target.checked)}
+                name="collaborative"
                 className="form-checkbox"
               />
               <span>Collaborative</span>
             </label>
             <button
+              type="submit"
+              name="export"
               className="ml-auto bg-blue-500 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-600 transition-colors"
-              onClick={onExport}
             >
               Export to Spotify
             </button>
             <button
+              type="submit"
+              name="save"
               className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-600 transition-colors"
-              onClick={onSave}
             >
               Save
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </>
   );

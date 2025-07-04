@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { Song } from "@/types/types";
 
 // unsure that this is secure -- i need to figure this out later
+
+// TODO: refresh user spotify token if expired
+// verify input data; ensure title is not empty, songUris is not empty, etc.
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();

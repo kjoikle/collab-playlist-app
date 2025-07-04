@@ -2,19 +2,10 @@
 
 import SongCard from "@/components/Playlist/SongCard";
 import SongSearch from "@/components/Playlist/SongSearch";
-import { Song } from "@/types/types";
+import { PlaylistCreate, Song } from "@/types/types";
 import React, { useState } from "react";
 import EditPlaylistHeader from "./EditPlaylistHeader";
-
-interface ExportPlaylistBody {
-  title: string;
-  description: string;
-  collaborative: boolean;
-  isPublic: boolean;
-  songUris: string[];
-}
-
-// take in an optional playlist object / else start from scratch
+import type { ExportPlaylistBody } from "@/types/types";
 
 const PlaylistEdit = () => {
   const [songs, setSongs] = useState<Song[]>([]);
@@ -23,7 +14,6 @@ const PlaylistEdit = () => {
     setSongs((prevSongs) => [...prevSongs, song]);
   };
 
-  // some way to check if they already have this playlist saved?
   const handleExport = async (
     title: string,
     description: string,
@@ -33,27 +23,67 @@ const PlaylistEdit = () => {
     const body: ExportPlaylistBody = {
       title: title || "New Playlist",
       description: description || "A playlist created with Project Meow",
-      collaborative: collaborative || false,
-      isPublic: isPublic || true,
+      collaborative: collaborative ?? false,
+      isPublic: isPublic ?? true,
       songUris: songs.map((song) => song.spotifyUri),
     };
 
-    const res = await fetch("/api/export-playlist-to-spotify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-    if (data.success) {
-      console.log("Playlist exported!");
-    } else {
-      console.error("Failed to export: " + (data.error || "Unknown error"));
+    try {
+      const response = await fetch("/api/export-playlist-to-spotify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.success === false) {
+        // TODO: replace alert with a toast notification for better UX
+        alert("Failed to export: " + (data.error || "Unknown error"));
+        return;
+      }
+
+      // TODO: replace alert with a toast notification for better UX
+      alert("Playlist exported successfully!");
+    } catch (error: any) {
+      // TODO: replace alert with a toast notification for better UX
+      alert(error.message || "An error occurred while exporting the playlist.");
+    }
+  };
+
+  const handleSave = async (title: string, description: string) => {
+    const newPlaylist: PlaylistCreate = {
+      title: title || "New Playlist",
+      description: description || "A playlist created with Project Meow",
+      isCollaborative: false,
+      isPublic: true,
+      songs: songs,
+    };
+
+    try {
+      const response = await fetch("/api/playlist/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newPlaylist),
+      });
+      const data = await response.json();
+      if (!response.ok || data.success === false) {
+        throw new Error(data.error || "Failed to create playlist");
+      }
+      // TODO: handle success, e.g., show a message or redirect
+      console.log("Playlist created:", data);
+    } catch (error: any) {
+      // TODO: change to a toast notification
+      alert(error.message || "An error occurred while creating the playlist.");
+      console.error(error);
     }
   };
 
   return (
     <div className="max-w-2xl mx-auto p-5">
-      <EditPlaylistHeader handleExport={handleExport} />
+      <EditPlaylistHeader handleExport={handleExport} handleSave={handleSave} />
 
       <SongSearch addSong={addSong} />
 

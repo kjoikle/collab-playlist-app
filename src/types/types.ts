@@ -21,10 +21,41 @@ export type SupabaseSong = {
   playlist_id: number;
 };
 
+export type SupabaseSongCreate = Omit<SupabaseSong, "id" | "created_at">;
+
+// tbd on this definition
+export interface Playlist {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  userId: string;
+  isCollaborative: boolean;
+  isPublic: boolean;
+  songs?: Song[];
+}
+
+export type PlaylistCreate = Omit<Playlist, "id" | "createdAt" | "userId">;
+
 export type SupabasePlaylist = {
   id: number;
   created_at: string;
   title: string;
   description: string;
   user_id: number;
+  is_public: boolean;
+  is_collaborative: boolean;
 };
+
+export type SupabasePlaylistCreate = Omit<
+  SupabasePlaylist,
+  "id" | "created_at"
+>;
+
+export interface ExportPlaylistBody {
+  title: string;
+  description: string;
+  collaborative: boolean;
+  isPublic: boolean;
+  songUris: string[];
+}
