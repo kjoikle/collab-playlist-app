@@ -1,46 +1,39 @@
-import { createClient } from "@/lib/supabase/client";
-import { Song } from "@/types/types";
+import type { Song } from "@/types/types";
+import type { ExportPlaylistBody } from "@/types/types";
 
-export const handleSaveNewPlaylist = async (
+export async function exportPlaylist(
+  songs: Song[],
   title: string,
   description: string,
-  songs: Song[]
-) => {
-  const supabase = createClient();
+  collaborative: boolean,
+  isPublic: boolean
+) {
+  const body: ExportPlaylistBody = {
+    title: title || "New Playlist",
+    description: description || "A playlist created with Project Meow",
+    collaborative: collaborative ?? false,
+    isPublic: isPublic ?? true,
+    songUris: songs.map((song) => song.spotifyUri),
+  };
 
-  const { error, data } = await supabase
-    .from("playlists")
-    .insert({
-      title: title || "New Playlist",
-      description: description || "A playlist created with Project Meow",
-      user_id: 1, // replace with actual user ID
-    })
-    .select();
-
-  if (error) {
-    console.error("Error saving playlist:", error);
-    return;
-  }
-
-  const playlistId = data[0].id;
-  songs.forEach(async (song) => {
-    const { error } = await supabase.from("songs").insert({
-      title: song.title,
-      artist: song.artist,
-      album: song.album,
-      cover_image: song.coverImage,
-      spotify_url: song.spotifyUrl,
-      isrc: song.isrc,
-      spotify_uri: song.spotifyUri,
-      playlist_id: playlistId,
+  try {
+    const response = await fetch("/api/export-playlist-to-spotify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     });
 
-    if (error) {
-      console.error("Error saving song:", error);
-    } else {
-      console.log(`Song ${song.title} saved to playlist ${playlistId}`);
-    }
-  });
+    const data = await response.json();
 
-  console.log("Playlist saved successfully!");
-};
+    if (!response.ok || data.success === false) {
+      throw new Error(data.error || "Failed to export playlist");
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "An error occurred while exporting the playlist.",
+    };
+  }
+}

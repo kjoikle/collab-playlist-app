@@ -47,6 +47,10 @@ export type SupabasePlaylist = {
   is_collaborative: boolean;
 };
 
+export type SupabasePlaylistWithSongs = SupabasePlaylist & {
+  songs: SupabaseSong[];
+};
+
 export type SupabasePlaylistCreate = Omit<
   SupabasePlaylist,
   "id" | "created_at"

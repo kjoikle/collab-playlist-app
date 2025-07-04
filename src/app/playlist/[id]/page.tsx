@@ -1,5 +1,7 @@
 import React from "react";
 import { getPlaylist } from "../actions";
+import PlaylistViewPage from "@/components/Playlist/PlaylistView";
+import { supabasePlaylistWithSongsToPlaylist } from "@/types/utils";
 
 interface PlaylistPageProps {
   params: { id: string };
@@ -10,11 +12,16 @@ const PlaylistPage = async ({ params }: PlaylistPageProps) => {
 
   const { id: playlistId } = await params;
 
-  const playlist = await getPlaylist(playlistId);
+  const supabasePlaylist = await getPlaylist(playlistId);
 
-  console.log("Playlist:", playlist);
+  if (!supabasePlaylist) {
+    // TODO: handle not found
+    return <div>Playlist not found</div>;
+  }
 
-  return <div>PlaylistPage ID: {playlistId}</div>;
+  const playlist = supabasePlaylistWithSongsToPlaylist(supabasePlaylist);
+
+  return <PlaylistViewPage playlist={playlist} />;
 };
 
 export default PlaylistPage;

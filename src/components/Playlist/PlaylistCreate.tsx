@@ -4,59 +4,27 @@ import SongCard from "@/components/Playlist/SongCard";
 import SongSearch from "@/components/Playlist/SongSearch";
 import { PlaylistCreate, Song } from "@/types/types";
 import React, { useState } from "react";
-import EditPlaylistHeader from "./EditPlaylistHeader";
-import type { ExportPlaylistBody } from "@/types/types";
+import CreatePlaylistHeader from "./CreatePlaylistHeader";
+import ExportToSpotifyButton from "./ExportToSpotifyButton";
 
-const PlaylistEdit = () => {
+const PlaylistCreatePage = () => {
   const [songs, setSongs] = useState<Song[]>([]);
 
   const addSong = (song: Song) => {
     setSongs((prevSongs) => [...prevSongs, song]);
   };
 
-  const handleExport = async (
+  const handleSave = async (
     title: string,
     description: string,
-    collaborative: boolean,
+    isCollaborative: boolean,
     isPublic: boolean
   ) => {
-    const body: ExportPlaylistBody = {
-      title: title || "New Playlist",
-      description: description || "A playlist created with Project Meow",
-      collaborative: collaborative ?? false,
-      isPublic: isPublic ?? true,
-      songUris: songs.map((song) => song.spotifyUri),
-    };
-
-    try {
-      const response = await fetch("/api/export-playlist-to-spotify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || data.success === false) {
-        // TODO: replace alert with a toast notification for better UX
-        alert("Failed to export: " + (data.error || "Unknown error"));
-        return;
-      }
-
-      // TODO: replace alert with a toast notification for better UX
-      alert("Playlist exported successfully!");
-    } catch (error: any) {
-      // TODO: replace alert with a toast notification for better UX
-      alert(error.message || "An error occurred while exporting the playlist.");
-    }
-  };
-
-  const handleSave = async (title: string, description: string) => {
     const newPlaylist: PlaylistCreate = {
       title: title || "New Playlist",
       description: description || "A playlist created with Project Meow",
-      isCollaborative: false,
-      isPublic: true,
+      isCollaborative,
+      isPublic,
       songs: songs,
     };
 
@@ -72,7 +40,7 @@ const PlaylistEdit = () => {
       if (!response.ok || data.success === false) {
         throw new Error(data.error || "Failed to create playlist");
       }
-      // TODO: handle success, e.g., show a message or redirect
+      // TODO: handle success, redirect to playlist/id page
       console.log("Playlist created:", data);
     } catch (error: any) {
       // TODO: change to a toast notification
@@ -83,7 +51,16 @@ const PlaylistEdit = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-5">
-      <EditPlaylistHeader handleExport={handleExport} handleSave={handleSave} />
+      <div className="flex justify-end mb-4">
+        <ExportToSpotifyButton
+          songs={songs}
+          title={"New Playlist"}
+          description={"A playlist created with Project Meow"}
+          collaborative={false}
+          isPublic={true}
+        />
+      </div>
+      <CreatePlaylistHeader handleSave={handleSave} />
 
       <SongSearch addSong={addSong} />
 
@@ -102,4 +79,4 @@ const PlaylistEdit = () => {
   );
 };
 
-export default PlaylistEdit;
+export default PlaylistCreatePage;

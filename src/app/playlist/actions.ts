@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { Playlist } from "@/types/types";
+import { SupabasePlaylistWithSongs } from "@/types/types";
 import { redirect } from "next/navigation";
 
 export async function getPlaylist(playlistId: string) {
@@ -36,7 +36,7 @@ export async function getPlaylist(playlistId: string) {
     return;
   }
 
-  const playlistWithSongs: Playlist = {
+  const playlistWithSongs: SupabasePlaylistWithSongs = {
     ...data,
     songs: songs || [],
   };

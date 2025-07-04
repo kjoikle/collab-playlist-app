@@ -1,25 +1,16 @@
 import React from "react";
 
-interface EditPlaylistHeaderProps {
+interface CreatePlaylistHeaderProps {
   handleSave: (
     title: string,
     description: string,
-    isPublic: boolean,
-    isCollaborative: boolean
+    isCollaborative: boolean,
+    isPublic: boolean
   ) => void;
-
-  originalTitle?: string;
-  originalDescription?: string;
-  isPublic?: boolean;
-  collaborative?: boolean;
 }
 
-const EditPlaylistHeader: React.FC<EditPlaylistHeaderProps> = ({
+const CreatePlaylistHeader: React.FC<CreatePlaylistHeaderProps> = ({
   handleSave,
-  originalTitle,
-  originalDescription,
-  isPublic,
-  collaborative,
 }) => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,14 +18,14 @@ const EditPlaylistHeader: React.FC<EditPlaylistHeaderProps> = ({
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const isPublic = formData.get("isPublic") === "on";
-    const isCollaborative = formData.get("isCollaborative") === "on";
-    await handleSave(title, description, isPublic, isCollaborative);
+    const collaborative = formData.get("collaborative") === "on";
+    await handleSave(title, description, collaborative, isPublic);
   };
 
   return (
     <>
       <h1 className="text-3xl font-bold mb-6 text-center">
-        Edit Your Playlist
+        Create Your Playlist
       </h1>
       <div className="flex justify-center mb-4">
         <form
@@ -45,15 +36,13 @@ const EditPlaylistHeader: React.FC<EditPlaylistHeaderProps> = ({
             <input
               type="text"
               name="title"
-              defaultValue={originalTitle || "New Playlist"}
+              placeholder="Playlist Title"
               className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-blue-500"
               required
             />
             <textarea
               name="description"
-              defaultValue={
-                originalDescription || "A playlist created with Project Meow"
-              }
+              placeholder="Description"
               className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-blue-500 resize-none"
               rows={2}
             />
@@ -63,7 +52,7 @@ const EditPlaylistHeader: React.FC<EditPlaylistHeaderProps> = ({
               <input
                 type="checkbox"
                 name="isPublic"
-                defaultChecked={isPublic}
+                defaultChecked
                 className="form-checkbox"
               />
               <span>Public</span>
@@ -71,8 +60,7 @@ const EditPlaylistHeader: React.FC<EditPlaylistHeaderProps> = ({
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                name="isCollaborative"
-                defaultChecked={collaborative}
+                name="collaborative"
                 className="form-checkbox"
               />
               <span>Collaborative</span>
@@ -91,4 +79,4 @@ const EditPlaylistHeader: React.FC<EditPlaylistHeaderProps> = ({
   );
 };
 
-export default EditPlaylistHeader;
+export default CreatePlaylistHeader;
