@@ -1,9 +1,9 @@
 import React from "react";
-import LoginForm from "@/components/AuthComponents/LoginForm";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import SignUpForm from "@/components/AuthComponents/SignUpForm";
 
-const LoginPage = async () => {
+const SignUpPage = async () => {
   // check that user is not already logged in; redirect to dashboard if they are
   const supabase = await createClient();
 
@@ -16,9 +16,9 @@ const LoginPage = async () => {
 
   return (
     <div className="flex h-screen items-center justify-center w-full">
-      <LoginForm />
+      <SignUpForm />
     </div>
   );
 };
 
-export default LoginPage;
+export default SignUpPage;

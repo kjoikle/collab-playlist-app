@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 
 // unsure that this is secure -- i need to figure this out later
 
+// TODO: refresh user spotify token if expired
+// verify input data; ensure title is not empty, songUris is not empty, etc.
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
 
@@ -11,8 +14,6 @@ export async function POST(req: NextRequest) {
   if (userError || !userData?.user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
-
-  console.log("User: ", userData.user);
 
   // Get the session to access the provider token
   const { data: sessionData, error: sessionError } =
@@ -62,15 +63,12 @@ export async function POST(req: NextRequest) {
   }
 
   const playlistData = await createPlaylistResponse.json();
-  console.log("Created playlist:", playlistData);
 
   const playlistId = playlistData.id;
   const updatePlaylistEndpoint = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
   const updatePlaylistBody = {
     uris: songUris,
   };
-
-  console.log(updatePlaylistBody);
 
   // NOTE: max of 100 songs per request
   const updatePlaylistResponse = await fetch(updatePlaylistEndpoint, {

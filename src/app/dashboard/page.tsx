@@ -1,14 +1,9 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import PlaylistCreate from "@/components/Playlist/PlaylistCreate";
+import PlaylistsDisplay from "@/components/Dashboard/PlaylistsDisplay";
+import { getUserPlaylists } from "./actions";
+import { Playlist } from "@/types/types";
 
 const Dashboard = async () => {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    redirect("/login");
-  }
+  const playlists: Playlist[] = (await getUserPlaylists()) ?? [];
 
   return (
     <div>
@@ -16,7 +11,8 @@ const Dashboard = async () => {
         Welcome to Project Meow
       </h1>
       <p className="text-center mt-4">Collaborative Playlist Maker</p>
-      <PlaylistCreate />
+
+      <PlaylistsDisplay playlists={playlists} />
     </div>
   );
 };
