@@ -1,20 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import type {
-  PlaylistCreate,
-  SupabasePlaylistCreate,
-  Song,
-} from "@/types/types";
+import type { PlaylistCreate, SupabasePlaylistCreate } from "@/types/playlist";
+import type { UpdatePlaylistData } from "@/types/playlist";
+import type { Song } from "@/types/song";
 import { addSong, deleteSong } from "@/lib/playlist/songHelpers";
-
-interface UpdatePlaylistData {
-  playlistId: number;
-  title: string;
-  description?: string;
-  isCollaborative?: boolean;
-  isPublic?: boolean;
-  addedSongs?: Song[];
-  deletedSongs?: Song[];
-}
 
 export async function createPlaylist(playlistData: PlaylistCreate) {
   const supabase = await createClient();
@@ -94,8 +82,8 @@ export async function updatePlaylist(updateData: UpdatePlaylistData) {
     description,
     isCollaborative,
     isPublic,
-    addedSongs = [],
-    deletedSongs = [],
+    addedSongs,
+    deletedSongs,
   } = updateData;
 
   const { error: updateError } = await supabase

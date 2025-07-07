@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { SupabasePlaylistWithSongs } from "@/types/types";
+import { SupabasePlaylistWithSongs } from "@/types/playlist";
 import { supabasePlaylistWithSongsToPlaylist } from "@/lib/types/utils";
 import { NextRequest, NextResponse } from "next/server";
 

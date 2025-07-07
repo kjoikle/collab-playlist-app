@@ -1,4 +1,4 @@
-import type { Song, SupabaseSongCreate } from "@/types/types";
+import type { Song, SupabaseSongCreate } from "@/types/song";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export async function addSong(

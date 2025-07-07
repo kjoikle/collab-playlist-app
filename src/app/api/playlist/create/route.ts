@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { PlaylistCreate } from "@/types/types";
+import type { PlaylistCreate } from "@/types/playlist";
 import { createPlaylist } from "@/lib/playlist/playlistHelpers";
 
 export async function POST(req: NextRequest) {

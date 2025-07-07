@@ -1,30 +1,5 @@
-export type Song = {
-  title: string;
-  artist: string;
-  album: string;
-  coverImage: string;
-  spotifyUrl: string;
-  isrc: string;
-  spotifyUri: string;
-};
+import type { Song, SupabaseSong } from "./song";
 
-export type SupabaseSong = {
-  id: number;
-  created_at: string;
-  title: string;
-  artist: string;
-  album: string;
-  cover_image: string;
-  spotify_url: string;
-  isrc: string;
-  spotify_uri: string;
-  playlist_id: number;
-  user_id: string; // tbd if this is needed
-};
-
-export type SupabaseSongCreate = Omit<SupabaseSong, "id" | "created_at">;
-
-// tbd on this definition
 export interface Playlist {
   id: string;
   title: string;
@@ -63,4 +38,14 @@ export interface ExportPlaylistBody {
   collaborative: boolean;
   isPublic: boolean;
   songUris: string[];
+}
+
+export interface UpdatePlaylistData {
+  playlistId: number;
+  title: string;
+  description?: string;
+  isCollaborative: boolean;
+  isPublic: boolean;
+  addedSongs: Song[];
+  deletedSongs: Song[];
 }

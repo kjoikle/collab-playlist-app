@@ -1,6 +1,6 @@
 "use client";
 
-import { Song } from "@/types/types";
+import { Song } from "@/types/song";
 import React, { useState, useEffect } from "react";
 import SongSearchCard from "./SongSearchCard";
 

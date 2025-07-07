@@ -1,5 +1,5 @@
-import type { Song } from "@/types/types";
-import type { ExportPlaylistBody } from "@/types/types";
+import type { Song } from "@/types/song";
+import type { ExportPlaylistBody } from "@/types/playlist";
 
 export async function exportPlaylist(
   songs: Song[],

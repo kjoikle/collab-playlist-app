@@ -2,7 +2,8 @@
 
 import SongCard from "@/components/Playlist/SongCard";
 import SongSearch from "@/components/Playlist/SongSearch";
-import { PlaylistCreate, Song } from "@/types/types";
+import { PlaylistCreate } from "@/types/playlist";
+import { Song } from "@/types/song";
 import React, { useState } from "react";
 import CreatePlaylistHeader from "./CreatePlaylistHeader";
 import ExportToSpotifyButton from "./ExportToSpotifyButton";
