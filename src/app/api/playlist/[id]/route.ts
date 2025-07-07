@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { SupabasePlaylistWithSongs } from "@/types/types";
-import { supabasePlaylistWithSongsToPlaylist } from "@/types/utils";
+import { supabasePlaylistWithSongsToPlaylist } from "@/lib/types/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(

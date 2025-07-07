@@ -3,7 +3,7 @@ import {
   Song,
   SupabasePlaylistWithSongs,
   SupabaseSong,
-} from "./types";
+} from "@/types/types";
 
 export function supabasePlaylistWithSongsToPlaylist(
   supabasePlaylist: SupabasePlaylistWithSongs
