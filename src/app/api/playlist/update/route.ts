@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   const updateData = await req.json();
   try {
     await updatePlaylist(updateData);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Error updating playlist:", error);
     return NextResponse.json(
@@ -32,6 +32,28 @@ export async function POST(req: NextRequest) {
 
 async function updatePlaylist(updateData: UpdatePlaylistData) {
   const supabase = await createClient();
+
+  // Check user authentication
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData?.user) {
+    throw new Error("Not authenticated");
+  }
+
+  // TODO: handle collab playlists
+  const { data: playlistData, error: playlistError } = await supabase
+    .from("playlists")
+    .select("user_id")
+    .eq("id", updateData.playlistId)
+    .single();
+
+  if (playlistError || !playlistData) {
+    throw new Error("Failed to fetch playlist");
+  }
+
+  if (playlistData.user_id !== userData.user.id) {
+    throw new Error("You are not the owner of this playlist");
+  }
+
   const {
     playlistId,
     title,

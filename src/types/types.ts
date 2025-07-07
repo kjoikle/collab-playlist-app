@@ -19,6 +19,7 @@ export type SupabaseSong = {
   isrc: string;
   spotify_uri: string;
   playlist_id: number;
+  user_id: string; // tbd if this is needed
 };
 
 export type SupabaseSongCreate = Omit<SupabaseSong, "id" | "created_at">;
@@ -42,7 +43,7 @@ export type SupabasePlaylist = {
   created_at: string;
   title: string;
   description: string;
-  user_id: number;
+  user_id: string;
   is_public: boolean;
   is_collaborative: boolean;
 };
