@@ -1,8 +1,8 @@
 import type { Song, SupabaseSongCreate } from "@/types/song";
-import { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export async function addSong(
-  supabase: SupabaseClient<any, "public", any>,
+  supabase: SupabaseClient,
   song: Song,
   playlistId: number
 ) {
@@ -29,7 +29,7 @@ export async function addSong(
 }
 
 export async function deleteSong(
-  supabase: any,
+  supabase: SupabaseClient,
   song: Song,
   playlistId: number
 ) {

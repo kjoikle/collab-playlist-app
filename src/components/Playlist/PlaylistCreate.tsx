@@ -48,9 +48,10 @@ const PlaylistCreatePage = () => {
       if (playlistId) {
         router.push(`/playlist/${playlistId}`);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // TODO: change to a toast notification
-      alert(error.message || "An error occurred while creating the playlist.");
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message || "An error occurred while creating the playlist.");
       console.error(error);
     }
   };

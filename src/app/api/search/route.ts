@@ -1,4 +1,9 @@
 import { getSpotifyToken } from "@/lib/spotify";
+import type {
+  SpotifyTracksResponse,
+  SpotifyTrack,
+  SpotifyArtist,
+} from "@/types/spotify";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -20,11 +25,11 @@ export async function GET(req: Request) {
     }
   );
 
-  const data = await res.json();
+  const data: SpotifyTracksResponse = await res.json();
 
-  const results = data.tracks.items.map((item: any) => ({
+  const results = data.tracks.items.map((item: SpotifyTrack) => ({
     title: item.name,
-    artist: item.artists.map((a: any) => a.name).join(", "),
+    artist: item.artists.map((a: SpotifyArtist) => a.name).join(", "),
     album: item.album.name,
     coverImage: item.album.images[0]?.url,
     spotifyUrl: item.external_urls.spotify,

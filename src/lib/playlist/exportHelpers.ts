@@ -30,10 +30,11 @@ export async function exportPlaylist(
     }
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
-      error: error.message || "An error occurred while exporting the playlist.",
+      error: message || "An error occurred while exporting the playlist.",
     };
   }
 }
