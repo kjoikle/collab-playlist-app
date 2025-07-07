@@ -7,12 +7,14 @@ export async function POST(req: NextRequest) {
     await updatePlaylist(updateData);
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: unknown) {
-    console.error("Error creating playlist:", error);
+    console.error("Error updating playlist:", error);
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       {
         success: false,
-        error: message || "Failed to create playlist",
+        error:
+          message ||
+          "An unexpected error occurred while updating the playlist. Please try again later.",
       },
       { status: 500 }
     );

@@ -16,7 +16,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: message || "Failed to create playlist",
+        error:
+          message ||
+          "An unexpected error occurred while creating the playlist. Please try again later.",
       },
       { status: 500 }
     );
