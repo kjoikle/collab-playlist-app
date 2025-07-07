@@ -3,31 +3,45 @@
 import SongCard from "@/components/Playlist/SongCard";
 import SongSearch from "@/components/Playlist/SongSearch";
 import { Song } from "@/types/types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import EditPlaylistHeader from "./EditPlaylistHeader";
-import type { Playlist } from "@/types/types";
 import ViewPlaylistHeader from "./ViewPlaylistHeader";
 import ExportToSpotifyButton from "./ExportToSpotifyButton";
+import useSWR from "swr";
 
 interface PlaylistViewPageProps {
-  playlist: Playlist;
+  playlistId: string;
 }
 
-const PlaylistViewPage: React.FC<PlaylistViewPageProps> = ({ playlist }) => {
-  const [songs, setSongs] = useState<Song[]>(playlist.songs || []);
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+const PlaylistViewPage: React.FC<PlaylistViewPageProps> = ({ playlistId }) => {
+  const { data, error, isLoading, mutate } = useSWR(
+    `/api/playlist/${playlistId}`,
+    fetcher
+  );
+
+  const [songs, setSongs] = useState<Song[]>([]);
   const [addedSongs, setAddedSongs] = useState<Song[]>([]);
   const [deletedSongs, setDeletedSongs] = useState<Song[]>([]);
   const [isEditing, setIsEditing] = useState(false);
 
   // Use state for all editable fields
-  const [playlistTitle, setPlaylistTitle] = useState(playlist.title);
-  const [playlistDescription, setPlaylistDescription] = useState(
-    playlist.description || ""
-  );
-  const [isPublic, setIsPublic] = useState(playlist.isPublic);
-  const [isCollaborative, setIsCollaborative] = useState(
-    playlist.isCollaborative
-  );
+  const [playlistTitle, setPlaylistTitle] = useState("");
+  const [playlistDescription, setPlaylistDescription] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
+  const [isCollaborative, setIsCollaborative] = useState(false);
+
+  useEffect(() => {
+    if (data && data.playlist) {
+      const playlist = data.playlist;
+      setSongs(playlist.songs || []);
+      setPlaylistTitle(playlist.title);
+      setPlaylistDescription(playlist.description || "");
+      setIsPublic(playlist.isPublic);
+      setIsCollaborative(playlist.isCollaborative);
+    }
+  }, [data]);
 
   const addSong = (song: Song) => {
     setSongs((prevSongs) => [...prevSongs, song]);
@@ -36,8 +50,10 @@ const PlaylistViewPage: React.FC<PlaylistViewPageProps> = ({ playlist }) => {
   };
 
   const removeSong = (song: Song) => {
-    setSongs((prevSongs) => prevSongs.filter((s) => s.isrc !== song.isrc));
-    if (playlist.songs?.some((s) => s.isrc === song.isrc)) {
+    const newSongList = songs.filter((s) => s.isrc !== song.isrc);
+
+    setSongs(newSongList);
+    if (playlist.songs?.some((s: Song) => s.isrc === song.isrc)) {
       setDeletedSongs((prev) => [...prev, song]);
     }
     setAddedSongs((prev) => prev.filter((s) => s.isrc !== song.isrc));
@@ -77,6 +93,7 @@ const PlaylistViewPage: React.FC<PlaylistViewPageProps> = ({ playlist }) => {
       setAddedSongs([]);
       setDeletedSongs([]);
       console.log("Playlist updated:", data);
+      mutate(); // Refetch the playlist data after saving
     } catch (error: any) {
       alert(error.message || "An error occurred while updating the playlist.");
       console.error(error);
@@ -86,8 +103,29 @@ const PlaylistViewPage: React.FC<PlaylistViewPageProps> = ({ playlist }) => {
   };
 
   const toggleEditMode = () => {
+    if (isEditing) {
+      // If switching to view mode, reset the playlist state
+      resetPlaylistState();
+    }
     setIsEditing((prev) => !prev);
   };
+
+  // Remove or rewrite resetPlaylistState, since state is now initialized from fetched playlist
+  const resetPlaylistState = () => {
+    setSongs(playlist.songs || []);
+    setAddedSongs([]);
+    setDeletedSongs([]);
+    setPlaylistTitle(playlist.title);
+    setPlaylistDescription(playlist.description || "");
+    setIsPublic(playlist.isPublic);
+    setIsCollaborative(playlist.isCollaborative);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error || !data || !data.playlist)
+    return <div>Error loading playlist.</div>;
+
+  const playlist = data.playlist;
 
   return (
     <div className="max-w-2xl mx-auto p-5">

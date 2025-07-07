@@ -14,10 +14,11 @@ export async function getUserPlaylists() {
     redirect("/login");
   }
 
-  // TODO: update to just get from a specific user
+  // TODO: figure out collaborative playlists fetching?
   const { data, error } = await supabase
     .from("playlists")
     .select("*")
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
   if (error) {

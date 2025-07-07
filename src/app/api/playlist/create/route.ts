@@ -10,8 +10,11 @@ import { addSong } from "../utils";
 export async function POST(req: NextRequest) {
   const playlistData: PlaylistCreate = await req.json();
   try {
-    await createPlaylist(playlistData);
-    return NextResponse.json({ success: true });
+    const result = await createPlaylist(playlistData);
+    return NextResponse.json(
+      { success: true, playlistId: result.playlistId },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error creating playlist:", error);
     return NextResponse.json(
@@ -27,14 +30,20 @@ export async function POST(req: NextRequest) {
 async function createPlaylist(playlistData: PlaylistCreate) {
   const supabase = await createClient();
 
-  // TODO: auth
+  // check user authentication
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData?.user) {
+    throw new Error("Not authenticated");
+  }
+
+  const userId = userData.user.id;
 
   const newPlaylist: SupabasePlaylistCreate = {
     title: playlistData.title || "New Playlist",
     description:
       playlistData.description ||
       `A playlist created with ${process.env.PROJECT_NAME}`,
-    user_id: 1, // replace with actual user ID
+    user_id: userId,
     is_public:
       typeof playlistData.isPublic === "boolean"
         ? playlistData.isPublic
@@ -63,5 +72,5 @@ async function createPlaylist(playlistData: PlaylistCreate) {
     await addSong(supabase, song, playlistId);
   }
 
-  console.log("Playlist saved successfully!");
+  return { success: true, playlistId: playlistId };
 }

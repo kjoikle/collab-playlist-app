@@ -1,6 +1,14 @@
 import type { Song, SupabaseSongCreate } from "@/types/types";
+import { SupabaseClient } from "@supabase/supabase-js";
 
-export async function addSong(supabase: any, song: Song, playlistId: number) {
+export async function addSong(
+  supabase: SupabaseClient<any, "public", any>,
+  song: Song,
+  playlistId: number
+) {
+  const { data: user } = await supabase.auth.getUser();
+  const userId = user?.user?.id;
+
   const newSong: SupabaseSongCreate = {
     title: song.title,
     artist: song.artist,
@@ -10,6 +18,7 @@ export async function addSong(supabase: any, song: Song, playlistId: number) {
     isrc: song.isrc,
     spotify_uri: song.spotifyUri,
     playlist_id: playlistId,
+    user_id: userId || "",
   };
   const { error } = await supabase.from("songs").insert(newSong);
   if (error) {

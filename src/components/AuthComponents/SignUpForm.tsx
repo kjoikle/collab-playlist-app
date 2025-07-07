@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SpotifyLoginButton from "./SpotifyLoginButton";
-import { signup } from "./actions";
+import { signup } from "@/actions/authComponentsActions";
 
 const SignUpForm: React.FC = () => {
   return (

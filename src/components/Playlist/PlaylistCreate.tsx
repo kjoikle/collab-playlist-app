@@ -6,8 +6,10 @@ import { PlaylistCreate, Song } from "@/types/types";
 import React, { useState } from "react";
 import CreatePlaylistHeader from "./CreatePlaylistHeader";
 import ExportToSpotifyButton from "./ExportToSpotifyButton";
+import { useRouter } from "next/navigation";
 
 const PlaylistCreatePage = () => {
+  const router = useRouter();
   const [songs, setSongs] = useState<Song[]>([]);
 
   const addSong = (song: Song) => {
@@ -40,8 +42,11 @@ const PlaylistCreatePage = () => {
       if (!response.ok || data.success === false) {
         throw new Error(data.error || "Failed to create playlist");
       }
-      // TODO: handle success, redirect to playlist/id page
       console.log("Playlist created:", data);
+      const playlistId = data?.playlistId;
+      if (playlistId) {
+        router.push(`/playlist/${playlistId}`);
+      }
     } catch (error: any) {
       // TODO: change to a toast notification
       alert(error.message || "An error occurred while creating the playlist.");

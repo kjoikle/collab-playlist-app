@@ -1,5 +1,5 @@
 import PlaylistsDisplay from "@/components/Dashboard/PlaylistsDisplay";
-import { getUserPlaylists } from "./actions";
+import { getUserPlaylists } from "@/actions/dashboardActions";
 import { Playlist } from "@/types/types";
 
 const Dashboard = async () => {
