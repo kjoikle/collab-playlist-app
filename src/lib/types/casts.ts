@@ -1,9 +1,5 @@
-import {
-  Playlist,
-  Song,
-  SupabasePlaylistWithSongs,
-  SupabaseSong,
-} from "./types";
+import { Playlist, SupabasePlaylistWithSongs } from "@/types/playlist";
+import { Song, SupabaseSong } from "@/types/song";
 
 export function supabasePlaylistWithSongsToPlaylist(
   supabasePlaylist: SupabasePlaylistWithSongs

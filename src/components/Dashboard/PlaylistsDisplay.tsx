@@ -1,5 +1,5 @@
 import React from "react";
-import { Playlist } from "@/types/types";
+import { Playlist } from "@/types/playlist";
 import PlaylistDisplayCard from "./PlaylistDisplayCard";
 
 interface PlaylistsDisplayProps {

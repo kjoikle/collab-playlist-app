@@ -1,4 +1,4 @@
-import { Playlist } from "@/types/types";
+import { Playlist } from "@/types/playlist";
 import React from "react";
 
 interface ViewPlaylistHeaderProps {

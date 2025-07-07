@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { SupabasePlaylistWithSongs } from "@/types/types";
+import { SupabasePlaylistWithSongs } from "@/types/playlist";
 import { redirect } from "next/navigation";
 
 export async function getPlaylist(playlistId: string) {

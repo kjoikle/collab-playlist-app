@@ -1,4 +1,4 @@
-import { Song } from "@/types/types";
+import { Song } from "@/types/song";
 import React from "react";
 
 interface SongSearchCardProps {

@@ -1,6 +1,6 @@
 import React from "react";
-import { Song } from "@/types/types";
-import { exportPlaylist } from "./utils";
+import { Song } from "@/types/song";
+import { exportPlaylist } from "@/lib/playlist/exportHelpers";
 
 interface ExportToSpotifyButtonProps {
   songs: Song[];

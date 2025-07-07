@@ -1,19 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
-import { SupabasePlaylistWithSongs } from "@/types/types";
-import { supabasePlaylistWithSongsToPlaylist } from "@/types/utils";
+import { SupabasePlaylistWithSongs } from "@/types/playlist";
+import { supabasePlaylistWithSongsToPlaylist } from "@/lib/types/casts";
 import { NextRequest, NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/lib/supabase/authHelpers";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const supabase = await createClient();
-
-  // check user authentication
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData?.user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const authResult = await requireAuthenticatedUser();
+  if ("error" in authResult) {
+    return NextResponse.json(authResult.error, { status: authResult.status });
   }
+
+  const supabase = await createClient();
 
   const { id: playlistId } = await params;
   if (!playlistId) {

@@ -1,6 +1,6 @@
 import PlaylistsDisplay from "@/components/Dashboard/PlaylistsDisplay";
 import { getUserPlaylists } from "@/actions/dashboardActions";
-import { Playlist } from "@/types/types";
+import { Playlist } from "@/types/playlist";
 
 const Dashboard = async () => {
   const playlists: Playlist[] = (await getUserPlaylists()) ?? [];

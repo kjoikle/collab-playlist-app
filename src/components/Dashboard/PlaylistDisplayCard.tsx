@@ -1,4 +1,4 @@
-import { Playlist } from "@/types/types";
+import { Playlist } from "@/types/playlist";
 import Link from "next/link";
 import React from "react";
 

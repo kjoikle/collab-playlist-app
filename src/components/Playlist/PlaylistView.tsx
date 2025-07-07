@@ -2,7 +2,7 @@
 
 import SongCard from "@/components/Playlist/SongCard";
 import SongSearch from "@/components/Playlist/SongSearch";
-import { Song } from "@/types/types";
+import { Song } from "@/types/song";
 import React, { useEffect, useState } from "react";
 import EditPlaylistHeader from "./EditPlaylistHeader";
 import ViewPlaylistHeader from "./ViewPlaylistHeader";
@@ -94,8 +94,9 @@ const PlaylistViewPage: React.FC<PlaylistViewPageProps> = ({ playlistId }) => {
       setDeletedSongs([]);
       console.log("Playlist updated:", data);
       mutate(); // Refetch the playlist data after saving
-    } catch (error: any) {
-      alert(error.message || "An error occurred while updating the playlist.");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message || "An error occurred while updating the playlist.");
       console.error(error);
     } finally {
       setIsEditing(false);

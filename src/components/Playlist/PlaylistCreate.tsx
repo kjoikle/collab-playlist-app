@@ -2,7 +2,8 @@
 
 import SongCard from "@/components/Playlist/SongCard";
 import SongSearch from "@/components/Playlist/SongSearch";
-import { PlaylistCreate, Song } from "@/types/types";
+import { PlaylistCreate } from "@/types/playlist";
+import { Song } from "@/types/song";
 import React, { useState } from "react";
 import CreatePlaylistHeader from "./CreatePlaylistHeader";
 import ExportToSpotifyButton from "./ExportToSpotifyButton";
@@ -47,9 +48,10 @@ const PlaylistCreatePage = () => {
       if (playlistId) {
         router.push(`/playlist/${playlistId}`);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // TODO: change to a toast notification
-      alert(error.message || "An error occurred while creating the playlist.");
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message || "An error occurred while creating the playlist.");
       console.error(error);
     }
   };
