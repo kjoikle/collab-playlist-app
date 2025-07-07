@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updatePlaylist } from "@/lib/playlist/playlistHelpers";
+import { requireAuthenticatedUser } from "@/lib/supabase/authHelpers";
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuthenticatedUser();
+  if ("error" in authResult) {
+    return NextResponse.json(authResult.error, { status: authResult.status });
+  }
+
   const updateData = await req.json();
   try {
     await updatePlaylist(updateData);

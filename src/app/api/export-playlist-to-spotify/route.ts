@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthenticatedUserAndSession } from "@/lib/supabase/authHelpers";
 
 // TODO: check spotify refresh worked
 
@@ -24,34 +24,14 @@ async function refreshSpotifyToken(refreshToken: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient();
-
-  // check user authentication
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData?.user) {
-    return NextResponse.json(
-      {
-        error:
-          "Not authenticated. Please log in to export playlists to Spotify.",
-      },
-      { status: 401 }
-    );
+  const authResult = await getAuthenticatedUserAndSession();
+  if ("error" in authResult) {
+    return NextResponse.json(authResult.error, { status: authResult.status });
   }
+  const { user, session } = authResult;
 
-  // Get the session to access the provider token
-  const { data: sessionData, error: sessionError } =
-    await supabase.auth.getSession();
-  if (sessionError || !sessionData?.session) {
-    return NextResponse.json(
-      {
-        error: "No session found. Please re-authenticate with Spotify.",
-      },
-      { status: 401 }
-    );
-  }
-
-  let accessToken = sessionData.session.provider_token;
-  const refreshToken = sessionData.session.provider_refresh_token;
+  let accessToken = session.provider_token;
+  const refreshToken = session.provider_refresh_token;
 
   // TODO: FIX THIS; If no access token, try to refresh it first
   if (!accessToken && refreshToken) {
@@ -99,7 +79,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const userId = userData.user.user_metadata.provider_id;
+    const userId = user.user_metadata.provider_id;
 
     const createPlaylistEndpoint = `https://api.spotify.com/v1/users/${userId}/playlists`;
     const createPlaylistBody = {
