@@ -20,7 +20,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: (error as Error).message || "Failed to create playlist",
+        error:
+          error instanceof Error
+            ? error.message
+            : String(error) || "Failed to create playlist",
       },
       { status: 500 }
     );
