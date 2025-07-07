@@ -10,15 +10,13 @@ export async function POST(req: NextRequest) {
       { success: true, playlistId: result.playlistId },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error creating playlist:", error);
+    const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : String(error) || "Failed to create playlist",
+        error: message || "Failed to create playlist",
       },
       { status: 500 }
     );

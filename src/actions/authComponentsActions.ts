@@ -8,8 +8,10 @@ import { createClient } from "@/lib/supabase/server";
 export async function login(formData: FormData) {
   const supabase = await createClient();
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+  const emailRaw = formData.get("email");
+  const email = typeof emailRaw === "string" ? emailRaw : "";
+  const passwordRaw = formData.get("password");
+  const password = typeof passwordRaw === "string" ? passwordRaw : "";
 
   // TODO: validate input
 

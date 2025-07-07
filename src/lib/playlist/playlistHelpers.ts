@@ -42,10 +42,10 @@ export async function createPlaylist(playlistData: PlaylistCreate) {
     );
   }
 
-  const playlistId = data[0].id;
+  const playlistId: number = data[0].id;
   const songs = playlistData.songs || [];
 
-  for (const song of songs as Song[]) {
+  for (const song of songs) {
     await addSong(supabase, song, playlistId);
   }
 

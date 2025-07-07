@@ -6,15 +6,13 @@ export async function POST(req: NextRequest) {
   try {
     await updatePlaylist(updateData);
     return NextResponse.json({ success: true }, { status: 200 });
-  } catch (error) {
-    console.error("Error updating playlist:", error);
+  } catch (error: unknown) {
+    console.error("Error creating playlist:", error);
+    const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : String(error) || "Failed to update playlist",
+        error: message || "Failed to create playlist",
       },
       { status: 500 }
     );
