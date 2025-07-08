@@ -1,4 +1,4 @@
-import PlaylistCreate from "@/components/Playlist/PlaylistCreate";
+import PlaylistCreate from "@/components/Playlist/PlaylistCreateOld";
 import React from "react";
 
 const CreatePlaylistPage = () => {

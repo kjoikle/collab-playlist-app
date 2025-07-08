@@ -9,7 +9,7 @@ export function supabasePlaylistWithSongsToPlaylist(
     title: supabasePlaylist.title,
     description: supabasePlaylist.description,
     createdAt: supabasePlaylist.created_at,
-    userId: supabasePlaylist.user_id.toString(),
+    owner: supabasePlaylist.user_id.toString(),
     isCollaborative: supabasePlaylist.is_collaborative,
     isPublic: supabasePlaylist.is_public,
     songs: supabasePlaylist.songs.map((song) => ({
@@ -20,6 +20,8 @@ export function supabasePlaylistWithSongsToPlaylist(
 
 export function supabaseSongToSong(supabaseSong: SupabaseSong): Song {
   return {
+    id: supabaseSong.id.toString(),
+    addedByUser: supabaseSong.user_id.toString(),
     title: supabaseSong.title,
     artist: supabaseSong.artist,
     album: supabaseSong.album,

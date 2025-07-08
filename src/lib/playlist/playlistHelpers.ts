@@ -3,6 +3,9 @@ import type { PlaylistCreate, SupabasePlaylistCreate } from "@/types/playlist";
 import type { UpdatePlaylistData } from "@/types/playlist";
 import type { Song } from "@/types/song";
 import { addSong, deleteSong } from "@/lib/playlist/songHelpers";
+import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
+import { requireAuthenticatedUser } from "../supabase/authHelpers";
+import { NextResponse } from "next/server";
 
 export async function createPlaylist(playlistData: PlaylistCreate) {
   const supabase = await createClient();
@@ -55,11 +58,12 @@ export async function createPlaylist(playlistData: PlaylistCreate) {
 export async function updatePlaylist(updateData: UpdatePlaylistData) {
   const supabase = await createClient();
 
-  // Check user authentication
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData?.user) {
-    throw new Error("Not authenticated");
+  const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
+  if ("error" in authResult) {
+    return NextResponse.json(authResult.error, { status: authResult.status });
   }
+
+  const userData = authResult.user;
 
   // TODO: handle collab playlists
   const { data: playlistData, error: playlistError } = await supabase
@@ -72,7 +76,7 @@ export async function updatePlaylist(updateData: UpdatePlaylistData) {
     throw new Error("Failed to fetch playlist");
   }
 
-  if (playlistData.user_id !== userData.user.id) {
+  if (playlistData.user_id !== userData.id) {
     throw new Error("You are not the owner of this playlist");
   }
 
@@ -112,3 +116,35 @@ export async function updatePlaylist(updateData: UpdatePlaylistData) {
 
   return { success: true };
 }
+
+export async function updatePlaylistDetails(
+  updateData: UpdatePlaylistDetailsRequestBody
+) {
+  const supabase = await createClient();
+
+  const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
+  if ("error" in authResult) {
+    return NextResponse.json(authResult.error, { status: authResult.status });
+  }
+
+  const { playlistId, title, description, isCollaborative, isPublic } =
+    updateData;
+
+  const { error: updateError } = await supabase
+    .from("playlists")
+    .update({
+      title,
+      description,
+      is_collaborative: isCollaborative,
+      is_public: isPublic,
+    })
+    .eq("id", playlistId);
+
+  if (updateError) {
+    throw new Error(`Error updating playlist: ${updateError.message}`);
+  }
+
+  return { success: true };
+}
+
+// TODO: implement add/remove collaborators

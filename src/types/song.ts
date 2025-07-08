@@ -1,4 +1,6 @@
 export type Song = {
+  id: string;
+  addedByUser: string; // TODO implement as a user type
   title: string;
   artist: string;
   album: string;
@@ -6,6 +8,7 @@ export type Song = {
   spotifyUrl: string;
   isrc: string;
   spotifyUri: string;
+  duration?: string; // TODO: make not optional
 };
 
 export type SupabaseSong = {

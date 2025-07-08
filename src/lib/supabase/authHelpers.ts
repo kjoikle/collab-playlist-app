@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 
+// TODO: be more rigid about permissions system
+
 /**
  * Checks for a valid authenticated user in Supabase.
  * Returns `{ user }` if authenticated, or `{ error, status }` for error responses.
