@@ -29,7 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// import { toast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
 import Link from "next/link";
 import { Playlist } from "@/types/playlist";
 import { Song } from "@/types/song";
@@ -67,7 +67,7 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
         throw new Error("Failed to remove song from playlist");
       }
     } catch (err) {
-      alert(err instanceof Error ? err.message : String(err));
+      toast.error(err instanceof Error ? err.message : String(err));
       // Reset UI by refetching playlist
       try {
         const res = await fetch(`/api/playlist/${playlistData?.id}`);
@@ -90,18 +90,16 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    // toast({
-    //   title: "Link copied!",
-    //   description: "Playlist link has been copied to your clipboard.",
-    // });
+    toast.success(
+      "Link copied! Playlist link has been copied to your clipboard."
+    );
   };
 
   const handleDownload = () => {
     // In a real app, this would generate and download a playlist file
-    // toast({
-    //   title: "Download started",
-    //   description: "Your playlist is being prepared for download.",
-    // });
+    toast.info(
+      "Download started. Your playlist is being prepared for download."
+    );
   };
 
   // const isOwner = playlistData.owner.name === "You"; // In a real app, this would check against current user

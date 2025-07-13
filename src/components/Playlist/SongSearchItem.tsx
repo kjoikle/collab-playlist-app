@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { Song } from "@/types/song";
+import { toast } from "react-toastify";
 
 interface SongSearchItemProps {
   song: Song;
@@ -54,7 +55,7 @@ export function SongSearchItem({
         song.id = data.id; // Update song object with new ID if available
       }
     } catch (error) {
-      // Optionally show a toast
+      toast.error(error instanceof Error ? error.message : String(error));
     } finally {
       setIsAdding(false);
     }

@@ -30,7 +30,6 @@ export function AddSongDialog({
   open,
   onOpenChange,
   playlistId,
-  onSongsAdded,
 }: AddSongDialogProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Song[]>([]);

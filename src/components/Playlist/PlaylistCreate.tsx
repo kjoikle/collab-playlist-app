@@ -13,8 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { PlaylistCreate } from "@/types/playlist";
+import { toast } from "react-toastify";
 
-// import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LoadingSpinner } from "../common/LoadingSpinner";
@@ -63,10 +63,9 @@ export function PlaylistCreate() {
       };
       setCollaborators([...collaborators, newCollaborator]);
       setCollaboratorEmail("");
-      // toast({
-      //   title: "Collaborator added",
-      //   description: `${newCollaborator.name} has been added as a collaborator.`,
-      // });
+      toast.success(
+        `${newCollaborator.name} has been added as a collaborator.`
+      );
     }
   };
 
@@ -111,19 +110,12 @@ export function PlaylistCreate() {
       console.log("Playlist created:", data);
       const playlistId = data?.playlistId;
 
-      // add toast here
-      // toast({
-      //   title: "Playlist created!",
-      //   description: `"${title}" has been created successfully.`,
-      // });
-
       if (playlistId) {
         router.push(`/playlist/${playlistId}`);
       }
     } catch (error: unknown) {
-      // TODO: change to a toast notification
       const message = error instanceof Error ? error.message : String(error);
-      alert(message || "An error occurred while creating the playlist.");
+      toast.error(message || "An error occurred while creating the playlist.");
       console.error(error);
     } finally {
       setIsLoading(false);
