@@ -1,5 +1,5 @@
 export type Song = {
-  id: string;
+  id: number;
   addedByUser: string; // TODO implement as a user type
   title: string;
   artist: string;

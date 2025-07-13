@@ -17,7 +17,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 type PlaylistCardProps = {
   playlist: Playlist;
   loadingPlaylist?: string | null;
-  handlePlaylistClick?: (id: string) => void;
+  handlePlaylistClick?: (id: number) => void;
 };
 
 const PlaylistCard: React.FC<PlaylistCardProps> = ({
@@ -57,7 +57,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-4">
+        <CardContent className="px-4">
           <CardTitle className="text-base line-clamp-1">
             {playlist.title}
           </CardTitle>

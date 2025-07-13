@@ -9,16 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+
 import { Song } from "@/types/song";
 
 interface SongCardProps {
@@ -29,7 +20,6 @@ interface SongCardProps {
 
 export function SongCard({ song, index, onRemove }: SongCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
 
   return (
     <>
@@ -67,7 +57,7 @@ export function SongCard({ song, index, onRemove }: SongCardProps) {
         </div>
 
         <div className="hidden sm:block text-sm text-muted-foreground">
-          <p>Added by {song.owner}</p>
+          <p>Added by {song.addedByUser}</p>
         </div>
 
         <div className="text-sm text-muted-foreground">{song.duration}</div>
@@ -82,7 +72,7 @@ export function SongCard({ song, index, onRemove }: SongCardProps) {
             <DropdownMenuContent align="end">
               {onRemove && (
                 <DropdownMenuItem
-                  onClick={() => setShowRemoveDialog(true)}
+                  onClick={() => onRemove()}
                   className="text-destructive"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -93,30 +83,6 @@ export function SongCard({ song, index, onRemove }: SongCardProps) {
           </DropdownMenu>
         </div>
       </div>
-
-      <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove song from playlist?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to remove "{song.title}" by {song.artist}{" "}
-              from this playlist? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                onRemove?.();
-                setShowRemoveDialog(false);
-              }}
-              className="bg-destructive hover:bg-destructive/90"
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }

@@ -2,7 +2,7 @@ import type { Song, SupabaseSong } from "./song";
 
 // Add owner property to Playlist interface
 export interface Playlist {
-  id: string;
+  id: number;
   title: string;
   description: string;
   createdAt: string;

@@ -49,7 +49,7 @@ export async function createPlaylist(playlistData: PlaylistCreate) {
   const songs = playlistData.songs || [];
 
   for (const song of songs) {
-    await addSong(supabase, song, playlistId);
+    await addSong(song, playlistId);
   }
 
   return { success: true, playlistId: playlistId };
@@ -60,7 +60,7 @@ export async function updatePlaylist(updateData: UpdatePlaylistData) {
 
   const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
   if ("error" in authResult) {
-    return NextResponse.json(authResult.error, { status: authResult.status });
+    throw new Error("Not authenticated");
   }
 
   const userData = authResult.user;
@@ -106,12 +106,12 @@ export async function updatePlaylist(updateData: UpdatePlaylistData) {
 
   // Add new songs
   for (const song of addedSongs as Song[]) {
-    await addSong(supabase, song, playlistId);
+    await addSong(song, playlistId);
   }
 
   // Remove deleted songs
   for (const song of deletedSongs as Song[]) {
-    await deleteSong(supabase, song, playlistId);
+    await deleteSong(song, playlistId);
   }
 
   return { success: true };
@@ -124,7 +124,7 @@ export async function updatePlaylistDetails(
 
   const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
   if ("error" in authResult) {
-    return NextResponse.json(authResult.error, { status: authResult.status });
+    throw new Error("Not authenticated");
   }
 
   const { playlistId, title, description, isCollaborative, isPublic } =

@@ -26,8 +26,6 @@ export function PlaylistGrid({
 
   const handlePlaylistClick = (playlistId: string | number) => {
     setLoadingPlaylist(playlistId.toString());
-    // The loading will be handled by Next.js navigation
-    // setTimeout(() => setLoadingPlaylist(null), 2000);
   };
 
   // Filter by type (all, owned, collaborative)

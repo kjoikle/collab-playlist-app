@@ -17,6 +17,7 @@ import type { PlaylistCreate } from "@/types/playlist";
 // import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { LoadingSpinner } from "../common/LoadingSpinner";
 
 interface Collaborator {
   id: string;
@@ -35,6 +36,7 @@ export function PlaylistCreate() {
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -84,6 +86,7 @@ export function PlaylistCreate() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     const newPlaylist: PlaylistCreate = {
       title: title || "New Playlist",
       description: description || "A playlist created with Project Meow",
@@ -122,6 +125,8 @@ export function PlaylistCreate() {
       const message = error instanceof Error ? error.message : String(error);
       alert(message || "An error occurred while creating the playlist.");
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -328,9 +333,15 @@ export function PlaylistCreate() {
             <Button
               type="submit"
               className="bg-purple-500 hover:bg-purple-600"
-              disabled={!title}
+              disabled={!title || isLoading}
+              style={{
+                minWidth: 130,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              Create Playlist
+              {isLoading ? <LoadingSpinner /> : "Create Playlist"}
             </Button>
           </div>
         </form>

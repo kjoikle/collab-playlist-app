@@ -18,10 +18,10 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { SongCard } from "./SongCard";
-import { AddSongDialog } from "./AddSongDialogue";
-import { EditPlaylistDialog } from "./EditPlaylistDialogue";
-import { CollaboratorDialog } from "./CollaboratorDialogue";
-import { SpotifyExportDialog } from "./SpotifyExportDialogue";
+import { AddSongDialog } from "./AddSongDialog";
+import { EditPlaylistDialog } from "./EditPlaylistDialog";
+import { CollaboratorDialog } from "./CollaboratorDialog";
+import { SpotifyExportDialog } from "./SpotifyExportDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,120 +34,58 @@ import Link from "next/link";
 import { Playlist } from "@/types/playlist";
 import { Song } from "@/types/song";
 import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
-
-// Sample playlist data
-const playlistData = {
-  id: "1",
-  title: "Summer Vibes 2024",
-  description:
-    "Perfect for sunny days and beach parties. A collection of upbeat tracks that capture the essence of summer.",
-  coverUrl: "/placeholder.svg?height=300&width=300",
-  isPublic: true,
-  isCollaborative: true,
-  owner: {
-    id: "user1",
-    name: "Alex Johnson",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  collaborators: [
-    {
-      id: "user2",
-      name: "Jamie Smith",
-      avatar: "/placeholder.svg?height=40&width=40",
-      role: "editor",
-    },
-    {
-      id: "user3",
-      name: "Taylor Brown",
-      avatar: "/placeholder.svg?height=40&width=40",
-      role: "viewer",
-    },
-  ],
-  createdAt: "2024-06-15",
-  updatedAt: "2024-07-05",
-  totalDuration: "2h 34m",
-  likes: 142,
-  songs: [
-    {
-      id: "song1",
-      title: "Blinding Lights",
-      artist: "The Weeknd",
-      album: "After Hours",
-      duration: "3:20",
-      coverUrl: "/placeholder.svg?height=60&width=60",
-      addedBy: "Alex Johnson",
-      addedAt: "2024-06-15",
-    },
-    {
-      id: "song2",
-      title: "Watermelon Sugar",
-      artist: "Harry Styles",
-      album: "Fine Line",
-      duration: "2:54",
-      coverUrl: "/placeholder.svg?height=60&width=60",
-      addedBy: "Jamie Smith",
-      addedAt: "2024-06-18",
-    },
-    {
-      id: "song3",
-      title: "Levitating",
-      artist: "Dua Lipa",
-      album: "Future Nostalgia",
-      duration: "3:23",
-      coverUrl: "/placeholder.svg?height=60&width=60",
-      addedBy: "Alex Johnson",
-      addedAt: "2024-06-20",
-    },
-    {
-      id: "song4",
-      title: "Good 4 U",
-      artist: "Olivia Rodrigo",
-      album: "SOUR",
-      duration: "2:58",
-      coverUrl: "/placeholder.svg?height=60&width=60",
-      addedBy: "Taylor Brown",
-      addedAt: "2024-06-25",
-    },
-    {
-      id: "song5",
-      title: "Stay",
-      artist: "The Kid LAROI & Justin Bieber",
-      album: "F*CK LOVE 3: OVER YOU",
-      duration: "2:21",
-      coverUrl: "/placeholder.svg?height=60&width=60",
-      addedBy: "Jamie Smith",
-      addedAt: "2024-07-01",
-    },
-  ],
-};
+import { PageLoading } from "../common/PageLoading";
 
 interface PlaylistViewProps {
   playlist: Playlist;
 }
 
 export function PlaylistView({ playlist }: PlaylistViewProps) {
-  const [playlistData, setPlaylistData] = useState(playlist);
+  const [playlistData, setPlaylistData] = useState<Playlist | null>(playlist);
   const [isAddSongOpen, setIsAddSongOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isCollaboratorOpen, setIsCollaboratorOpen] = useState(false);
   const [isSpotifyExportOpen, setIsSpotifyExportOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
-  const handleRemoveSong = (song: Song) => {
-    setPlaylistData((prev) => ({
-      ...prev,
-      songs: prev.songs.filter((s) => s.id !== song.id),
-    }));
-    // toast({
-    //   title: "Song removed",
-    //   description: "The song has been removed from your playlist.",
-    // });
+  const handleRemoveSong = async (song: Song) => {
+    // Optimistically update UI
+    setPlaylistData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        songs: prev.songs.filter((s) => s.id !== song.id),
+      };
+    });
+    try {
+      const res = await fetch("/api/playlist/delete-song", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ song, playlistId: playlistData?.id }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to remove song from playlist");
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : String(err));
+      // Reset UI by refetching playlist
+      try {
+        const res = await fetch(`/api/playlist/${playlistData?.id}`);
+        if (res.ok) {
+          const updated = await res.json();
+          setPlaylistData(updated);
+        }
+      } catch {}
+    }
   };
 
   const handleUpdatePlaylistDetails = (
     updatePayload: UpdatePlaylistDetailsRequestBody
   ) => {
-    setPlaylistData((prev) => ({ ...prev, ...updatePayload }));
+    setPlaylistData((prev) => {
+      if (!prev) return prev;
+      return { ...prev, ...updatePayload };
+    });
   };
 
   const handleShare = () => {
@@ -173,24 +111,42 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
   const isOwner = true;
   const canEdit = true;
 
+  // Refetch playlist from API after adding songs
+  const handleSongsAdded = async () => {
+    try {
+      const res = await fetch(`/api/playlist/${playlistData?.id}`);
+      if (!res.ok) throw new Error("Failed to fetch playlist");
+      const updated = await res.json();
+      setPlaylistData(updated);
+    } catch (err) {
+      // Optionally show a toast or error
+    }
+  };
+
+  if (!playlistData || !Array.isArray(playlistData.songs)) {
+    return <PageLoading />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Top Navigation Bar */}
       <div className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-6 py-3">
           <div className="flex items-center gap-4">
-            <Link href="/">
+            <Link href="/dashboard">
               <Button variant="ghost" size="icon" className="hover:bg-accent">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
             <div className="flex-1">
               <h1 className="text-lg font-semibold truncate">
-                {playlistData.title}
+                {playlistData?.title}
               </h1>
               <p className="text-sm text-muted-foreground">
-                {/* {playlistData.songs.length} songs • {playlistData.totalDuration} */}
-                {playlistData.songs.length} songs • TODO
+                {playlistData?.songs.length == 1
+                  ? "1 song"
+                  : `${playlistData?.songs.length} songs`}{" "}
+                • duration
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -348,7 +304,11 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
                 <span>NAME</span>
               </div>
               <span>•</span>
-              <span>0 songs</span>
+              <span>
+                {playlistData.songs.length === 1
+                  ? "1 song"
+                  : `${playlistData.songs.length} songs`}
+              </span>
               <span>•</span>
               <span>0:00</span>
               <span>•</span>
@@ -380,22 +340,35 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
         {/* Songs List */}
         <Card className="bg-card border-border">
           <CardContent className="p-0">
-            <div className="space-y-1">
-              {playlistData.songs.map((song, index) => (
-                <SongCard
-                  key={song.id}
-                  song={song}
-                  index={index + 1}
-                  onRemove={canEdit ? () => handleRemoveSong(song) : undefined}
-                />
-              ))}
-            </div>
+            {playlistData.songs.length === 0 ? (
+              <div className="py-4 text-center text-muted-foreground text-lg">
+                <span>No songs added yet.</span>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {playlistData.songs.map((song, index) => (
+                  <SongCard
+                    key={song.id}
+                    song={song}
+                    index={index + 1}
+                    onRemove={
+                      canEdit ? () => handleRemoveSong(song) : undefined
+                    }
+                  />
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
       {/* Dialogs */}
-      {/* <AddSongDialog open={isAddSongOpen} onOpenChange={setIsAddSongOpen} /> */}
+      <AddSongDialog
+        playlistId={playlistData.id}
+        open={isAddSongOpen}
+        onOpenChange={setIsAddSongOpen}
+        onSongsAdded={handleSongsAdded}
+      />
       <EditPlaylistDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}

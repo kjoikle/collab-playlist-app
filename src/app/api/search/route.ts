@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     return new Response("Failed to get Spotify token", { status: 500 });
 
   const res = await fetch(
-    `https://api.spotify.com/v1/search?type=track&limit=5&q=${encodeURIComponent(
+    `https://api.spotify.com/v1/search?type=track&limit=10&q=${encodeURIComponent(
       query
     )}`,
     {
