@@ -382,7 +382,7 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
       <SpotifyExportDialog
         open={isSpotifyExportOpen}
         onOpenChange={setIsSpotifyExportOpen}
-        playlist={playlist}
+        playlist={playlistData}
       />
     </div>
   );
