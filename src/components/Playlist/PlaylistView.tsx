@@ -35,12 +35,15 @@ import { Playlist } from "@/types/playlist";
 import { Song } from "@/types/song";
 import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
 import { PageLoading } from "../common/PageLoading";
-
+import { isPlaylistOwner } from "@/lib/playlist/playlistHelpers";
+import { useUser } from "@/context/UserContext";
+import type { User } from "@/types/user";
 interface PlaylistViewProps {
   playlist: Playlist;
 }
 
 export function PlaylistView({ playlist }: PlaylistViewProps) {
+  const { user } = useUser();
   const [playlistData, setPlaylistData] = useState<Playlist | null>(playlist);
   const [isAddSongOpen, setIsAddSongOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -106,8 +109,8 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
   // const canEdit =
   //   isOwner || playlistData.collaborators.some((c) => c.role === "editor");
   // TODO: Implement real ownership and edit permissions
-  const isOwner = true;
-  const canEdit = true;
+  const isOwner = playlistData ? isPlaylistOwner(playlistData, user) : false;
+  const canEdit = isOwner; // add collab logic
 
   // Refetch playlist from API after adding songs
   const handleSongsAdded = async () => {

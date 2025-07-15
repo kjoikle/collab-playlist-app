@@ -20,7 +20,7 @@ import { SongSearchItem } from "@/components/Playlist/SongSearchItem";
 interface AddSongDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  playlistId: number;
+  playlistId: string;
   onSongsAdded?: () => void;
 }
 
@@ -34,7 +34,7 @@ export function AddSongDialog({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Song[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [addedSongs, setAddedSongs] = useState<Set<number>>(new Set());
+  const [addedSongs, setAddedSongs] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState("search");
 
   // Debounced search
@@ -57,11 +57,11 @@ export function AddSongDialog({
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const handleSongAdded = useCallback((songId: number) => {
+  const handleSongAdded = useCallback((songId: string) => {
     setAddedSongs((prev) => new Set([...prev, songId]));
   }, []);
 
-  const handleSongRemoved = useCallback((songId: number) => {
+  const handleSongRemoved = useCallback((songId: string) => {
     setAddedSongs((prev) => {
       const newSet = new Set(prev);
       newSet.delete(songId);

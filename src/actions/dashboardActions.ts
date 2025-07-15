@@ -1,6 +1,7 @@
 "server-only";
 
 import { createClient } from "@/lib/supabase/server";
+import { supabasePlaylistToPlaylistWithoutSongs } from "@/lib/types/casts";
 import { redirect } from "next/navigation";
 
 export async function getUserPlaylists() {
@@ -26,6 +27,12 @@ export async function getUserPlaylists() {
     return;
   }
 
+  const playlistData = await Promise.all(
+    data.map(
+      async (playlist) => await supabasePlaylistToPlaylistWithoutSongs(playlist)
+    )
+  );
+
   // can create a DTO to return only necessary fields; may need to to recast to Playlist type
-  return data;
+  return playlistData;
 }

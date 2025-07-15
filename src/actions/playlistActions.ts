@@ -42,8 +42,9 @@ export async function getPlaylist(playlistId: string) {
     songs: songs || [],
   };
 
-  const playlistObject: Playlist =
-    supabasePlaylistWithSongsToPlaylist(playlistWithSongs);
+  const playlistObject: Playlist = await supabasePlaylistWithSongsToPlaylist(
+    playlistWithSongs
+  );
 
   // can create a DTO to return only necessary fields
   return playlistObject;

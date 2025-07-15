@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Playlist } from "@/types/playlist";
 import PlaylistCard from "../Playlist/PlaylistCard";
+import { isPlaylistOwner } from "@/lib/playlist/playlistHelpers";
+import { useUser } from "@/context/UserContext";
 
 interface PlaylistGridProps {
   filter: string;
@@ -22,6 +24,7 @@ export function PlaylistGrid({
   playlists = [],
 }: PlaylistGridProps) {
   const [loadingPlaylist, setLoadingPlaylist] = useState<string | null>(null);
+  const { user } = useUser();
 
   const handlePlaylistClick = (playlistId: string | number) => {
     setLoadingPlaylist(playlistId.toString());
@@ -30,7 +33,7 @@ export function PlaylistGrid({
   // Filter by type (all, owned, collaborative)
   let filteredPlaylists = playlists.filter((playlist) => {
     if (filter === "all") return true;
-    if (filter === "owned") return true; // TODO: actually check ownership
+    if (filter === "owned") return isPlaylistOwner(playlist, user);
     if (filter === "collaborative") return playlist.isCollaborative;
     return true;
   });

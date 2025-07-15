@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   }
 
   const user: User = {
-    id: data.id,
+    user_id: data.user_id,
     email: data.email,
     displayName: data.display_name,
     createdAt: data.created_at,

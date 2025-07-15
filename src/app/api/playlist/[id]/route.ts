@@ -53,7 +53,9 @@ export async function GET(
     songs: songs || [],
   };
 
-  const returnPlaylist = supabasePlaylistWithSongsToPlaylist(playlistWithSongs);
+  const returnPlaylist = await supabasePlaylistWithSongsToPlaylist(
+    playlistWithSongs
+  );
 
   return NextResponse.json({ playlist: returnPlaylist });
 }

@@ -7,9 +7,9 @@ import { toast } from "react-toastify";
 
 interface SongSearchItemProps {
   song: Song;
-  playlistId: number;
-  onSongAdded: (songId: number) => void;
-  onSongRemoved: (songId: number) => void;
+  playlistId: string;
+  onSongAdded: (songId: string) => void;
+  onSongRemoved: (songId: string) => void;
 }
 
 export function SongSearchItem({

@@ -1,6 +1,8 @@
+import { User } from "./user";
+
 export type Song = {
-  id: number;
-  addedByUser: string; // TODO implement as a user type
+  id: string;
+  addedByUser: User;
   title: string;
   artist: string;
   album: string;

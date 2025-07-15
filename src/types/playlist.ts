@@ -1,12 +1,13 @@
+import { User } from "./user";
 import type { Song, SupabaseSong } from "./song";
 
 // Add owner property to Playlist interface
 export interface Playlist {
-  id: number;
+  id: string;
   title: string;
   description: string;
   createdAt: string;
-  owner: string; // TODO: implement as a user type
+  owner: User;
   isCollaborative: boolean;
   isPublic: boolean;
   songs: Song[];

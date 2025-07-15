@@ -1,11 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
-import type { PlaylistCreate, SupabasePlaylistCreate } from "@/types/playlist";
+import type {
+  Playlist,
+  PlaylistCreate,
+  SupabasePlaylistCreate,
+} from "@/types/playlist";
 import type { UpdatePlaylistData } from "@/types/playlist";
 import type { Song } from "@/types/song";
 import { addSong, deleteSong } from "@/lib/playlist/songHelpers";
 import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
 import { requireAuthenticatedUser } from "../supabase/authHelpers";
-import { NextResponse } from "next/server";
+import { useUser } from "@/context/UserContext";
+import type { User } from "@/types/user";
 
 export async function createPlaylist(playlistData: PlaylistCreate) {
   const supabase = await createClient();
@@ -145,6 +150,12 @@ export async function updatePlaylistDetails(
   }
 
   return { success: true };
+}
+
+export function isPlaylistOwner(playlist: Playlist, user: User | null) {
+  console.log(playlist, user);
+  if (!user) return false;
+  return playlist.owner.user_id === user.user_id;
 }
 
 // TODO: implement add/remove collaborators
