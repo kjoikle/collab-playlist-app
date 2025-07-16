@@ -6,6 +6,7 @@ import {
   CardContent,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "../ui/card";
 import { Button } from "../ui/button";
 import { Play, Users } from "lucide-react";
@@ -13,11 +14,12 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { Playlist } from "../../types/playlist";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { getUserNameToDisplay } from "@/lib/userHelpers";
 
 type PlaylistCardProps = {
   playlist: Playlist;
   loadingPlaylist?: string | null;
-  handlePlaylistClick?: (id: number) => void;
+  handlePlaylistClick?: (id: string) => void;
 };
 
 const PlaylistCard: React.FC<PlaylistCardProps> = ({
@@ -25,6 +27,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
   loadingPlaylist,
   handlePlaylistClick = () => {},
 }) => {
+  const userName = getUserNameToDisplay(playlist.owner);
   return (
     <Link
       href={`/playlist/${playlist.id}`}
@@ -65,20 +68,18 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
             {playlist.description}
           </CardDescription>
         </CardContent>
-        {/* <CardFooter className="p-4 pt-0 flex items-center justify-between">
+        <CardFooter className="p-4 pt-0 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Avatar className="h-6 w-6">
               <AvatarImage
-                src={playlist.owner.avatar || "/placeholder.svg"}
-                alt={playlist.owner.name}
+                src={playlist.owner.profilePicture || "/placeholder.svg"}
+                alt={userName}
               />
-              <AvatarFallback>{playlist.owner.name[0]}</AvatarFallback>
+              <AvatarFallback>{userName[0]}</AvatarFallback>
             </Avatar>
-            <span className="text-xs text-muted-foreground">
-              {playlist.owner.name}
-            </span>
+            <span className="text-xs text-muted-foreground">{userName}</span>
           </div>
-          {playlist.isCollaborative && (
+          {/* {playlist.isCollaborative && (
             <Badge
               variant="outline"
               className="gap-1 text-xs border-purple-200 text-purple-500"
@@ -86,8 +87,8 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
               <Users className="h-3 w-3" />
               {playlist.collaborators}
             </Badge>
-          )}
-        </CardFooter> */}
+          )} */}
+        </CardFooter>
       </Card>
     </Link>
   );

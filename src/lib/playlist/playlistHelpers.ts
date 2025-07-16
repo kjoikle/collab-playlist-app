@@ -152,10 +152,4 @@ export async function updatePlaylistDetails(
   return { success: true };
 }
 
-export function isPlaylistOwner(playlist: Playlist, user: User | null) {
-  console.log(playlist, user);
-  if (!user) return false;
-  return playlist.owner.user_id === user.user_id;
-}
-
 // TODO: implement add/remove collaborators

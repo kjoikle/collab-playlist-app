@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Playlist } from "@/types/playlist";
 import PlaylistCard from "../Playlist/PlaylistCard";
-import { isPlaylistOwner } from "@/lib/playlist/playlistHelpers";
+import { isPlaylistOwner } from "@/lib/userHelpers";
 import { useUser } from "@/context/UserContext";
 
 interface PlaylistGridProps {

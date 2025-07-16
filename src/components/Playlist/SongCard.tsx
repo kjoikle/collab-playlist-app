@@ -11,14 +11,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Song } from "@/types/song";
+import { getUserNameToDisplay } from "@/lib/userHelpers";
 
 interface SongCardProps {
   song: Song;
   index: number;
   onRemove?: () => void;
+  isCollaborative: boolean;
 }
 
-export function SongCard({ song, index, onRemove }: SongCardProps) {
+export function SongCard({
+  song,
+  index,
+  onRemove,
+  isCollaborative,
+}: SongCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -56,9 +63,11 @@ export function SongCard({ song, index, onRemove }: SongCardProps) {
           <p className="truncate">{song.album}</p>
         </div>
 
-        <div className="hidden sm:block text-sm text-muted-foreground">
-          <p>Added by {song.addedByUser}</p>
-        </div>
+        {isCollaborative && (
+          <div className="hidden sm:block text-sm text-muted-foreground">
+            <p>Added by {getUserNameToDisplay(song.addedByUser)}</p>
+          </div>
+        )}
 
         <div className="text-sm text-muted-foreground">{song.duration}</div>
 

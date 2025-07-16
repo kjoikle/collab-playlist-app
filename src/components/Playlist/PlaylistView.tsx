@@ -35,9 +35,8 @@ import { Playlist } from "@/types/playlist";
 import { Song } from "@/types/song";
 import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
 import { PageLoading } from "../common/PageLoading";
-import { isPlaylistOwner } from "@/lib/playlist/playlistHelpers";
+import { getUserNameToDisplay, isPlaylistOwner } from "@/lib/userHelpers";
 import { useUser } from "@/context/UserContext";
-import type { User } from "@/types/user";
 interface PlaylistViewProps {
   playlist: Playlist;
 }
@@ -300,9 +299,11 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={"/placeholder.svg"} />
-                  <AvatarFallback>NAME</AvatarFallback>
+                  <AvatarFallback>
+                    {getUserNameToDisplay(playlistData.owner)}
+                  </AvatarFallback>
                 </Avatar>
-                <span>NAME</span>
+                <span>{getUserNameToDisplay(playlistData.owner)}</span>
               </div>
               <span>•</span>
               <span>
@@ -355,6 +356,7 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
                     onRemove={
                       canEdit ? () => handleRemoveSong(song) : undefined
                     }
+                    isCollaborative={playlistData.isCollaborative}
                   />
                 ))}
               </div>
