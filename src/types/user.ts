@@ -4,7 +4,7 @@ enum LoginMethod {
 }
 
 export interface User {
-  user_id: string;
+  id: string;
   email?: string;
   displayName?: string;
   createdAt: string;
@@ -13,7 +13,7 @@ export interface User {
 }
 
 export interface SupabaseUser {
-  user_id: string;
+  id: string;
   email?: string;
   created_at: string;
   display_name?: string;

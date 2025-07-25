@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabase
     .from("users")
     .select("*")
-    .eq("user_id", userId)
+    .eq("id", userId)
     .single();
 
   if (error || !data) {
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   }
 
   const user: User = {
-    user_id: data.user_id,
+    id: data.id,
     email: data.email,
     displayName: data.display_name,
     createdAt: data.created_at,

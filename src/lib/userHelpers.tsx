@@ -11,7 +11,7 @@ export async function getUserById(id: string): Promise<User> {
   const { data, error } = await supabase
     .from("users")
     .select("*")
-    .eq("user_id", id)
+    .eq("id", id)
     .single();
 
   if (error || !data) {
@@ -19,7 +19,7 @@ export async function getUserById(id: string): Promise<User> {
   }
 
   return {
-    user_id: data.user_id,
+    id: data.id,
     email: data.email,
     displayName: data.display_name,
     createdAt: data.created_at,
@@ -31,7 +31,7 @@ export async function getUserById(id: string): Promise<User> {
 export function isPlaylistOwner(playlist: Playlist, user: User | null) {
   console.log(playlist, user);
   if (!user) return false;
-  return playlist.owner.user_id === user.user_id;
+  return playlist.owner.id === user.id;
 }
 
 export function getUserNameToDisplay(user: User | null): string {
