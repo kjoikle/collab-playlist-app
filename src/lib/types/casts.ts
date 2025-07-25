@@ -2,6 +2,7 @@ import { getUserById } from "@/lib/userHelpers";
 import { Playlist, SupabasePlaylistWithSongs } from "@/types/playlist";
 import { Song, SupabaseSong } from "@/types/song";
 import { User } from "@/types/user";
+import { getCollaborators } from "../playlist/collaboratorHelpers";
 
 export async function supabasePlaylistWithSongsToPlaylist(
   supabasePlaylist: SupabasePlaylistWithSongs
@@ -18,6 +19,7 @@ export async function supabasePlaylistWithSongsToPlaylist(
     songs: await Promise.all(
       supabasePlaylist.songs.map((song) => supabaseSongToSong(song))
     ),
+    collaborators: await getCollaborators(supabasePlaylist.id.toString()),
   };
 }
 
@@ -34,6 +36,7 @@ export async function supabasePlaylistToPlaylistWithoutSongs(
     isCollaborative: supabasePlaylist.is_collaborative,
     isPublic: supabasePlaylist.is_public,
     songs: [],
+    collaborators: await getCollaborators(supabasePlaylist.id.toString()),
   };
 }
 

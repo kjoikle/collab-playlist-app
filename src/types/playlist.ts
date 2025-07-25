@@ -12,9 +12,13 @@ export interface Playlist {
   isPublic: boolean;
   songs: Song[];
   coverImage?: string;
+  collaborators: User[]; // Optional, for collaborative playlists
 }
 
-export type PlaylistCreate = Omit<Playlist, "id" | "createdAt" | "owner">;
+export type PlaylistCreate = Omit<
+  Playlist,
+  "id" | "createdAt" | "owner" | "collaborators"
+>;
 
 export type SupabasePlaylist = {
   id: number;
