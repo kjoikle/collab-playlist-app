@@ -4,10 +4,7 @@ import { requireAuthenticatedUser } from "@/lib/supabase/authHelpers";
 import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
 
 export async function POST(req: NextRequest) {
-  const authResult = await requireAuthenticatedUser(); // TODO: check they can edit
-  if ("error" in authResult) {
-    return NextResponse.json(authResult.error, { status: authResult.status });
-  }
+  await requireAuthenticatedUser(); // TODO: check they can edit
 
   const updateData: UpdatePlaylistDetailsRequestBody = await req.json();
   try {

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 /**
  * Checks for a valid authenticated user in Supabase.
- * Returns `{ user }` if authenticated, or `{ error, status }` for error responses.
+ * Returns the user if authenticated, or throws an error if not.
  */
 export async function requireAuthenticatedUser() {
   const supabase = await createClient();
@@ -12,12 +12,7 @@ export async function requireAuthenticatedUser() {
   // Check user authentication
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError || !userData?.user) {
-    return {
-      error: {
-        error: "Not authenticated. Please log in.",
-      },
-      status: 401,
-    };
+    throw new Error("Not authenticated. Please log in.");
   }
 
   return { user: userData.user };
@@ -27,7 +22,7 @@ export async function requireAuthenticatedUser() {
 
 /**
  * Checks for a valid authenticated user and session in Supabase.
- * Returns `{ user, session }` if authenticated, or `{ error, status }` for error responses.
+ * Returns { user, session } if authenticated, or throws an error if not.
  */
 export async function getAuthenticatedUserAndSession() {
   const supabase = await createClient();
@@ -35,24 +30,14 @@ export async function getAuthenticatedUserAndSession() {
   // Check user authentication
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError || !userData?.user) {
-    return {
-      error: {
-        error: "Not authenticated. Please log in.",
-      },
-      status: 401,
-    };
+    throw new Error("Not authenticated. Please log in.");
   }
 
   // Get the session to access the provider token
   const { data: sessionData, error: sessionError } =
     await supabase.auth.getSession();
   if (sessionError || !sessionData?.session) {
-    return {
-      error: {
-        error: "No session found. Please re-authenticate.",
-      },
-      status: 401,
-    };
+    throw new Error("No session found. Please re-authenticate.");
   }
 
   return { user: userData.user, session: sessionData.session };

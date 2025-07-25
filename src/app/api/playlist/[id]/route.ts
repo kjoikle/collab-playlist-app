@@ -8,10 +8,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const authResult = await requireAuthenticatedUser();
-  if ("error" in authResult) {
-    return NextResponse.json(authResult.error, { status: authResult.status });
-  }
+  await requireAuthenticatedUser();
 
   const supabase = await createClient();
 

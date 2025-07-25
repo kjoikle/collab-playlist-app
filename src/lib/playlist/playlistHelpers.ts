@@ -57,12 +57,7 @@ export async function createPlaylist(playlistData: PlaylistCreate) {
 export async function updatePlaylist(updateData: UpdatePlaylistData) {
   const supabase = await createClient();
 
-  const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
-  if ("error" in authResult) {
-    throw new Error("Not authenticated");
-  }
-
-  const userData = authResult.user;
+  const { user: userData } = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
 
   // TODO: handle collab playlists
   const { data: playlistData, error: playlistError } = await supabase
@@ -121,10 +116,7 @@ export async function updatePlaylistDetails(
 ) {
   const supabase = await createClient();
 
-  const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
-  if ("error" in authResult) {
-    throw new Error("Not authenticated");
-  }
+  await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
 
   const { playlistId, title, description, isCollaborative, isPublic } =
     updateData;
