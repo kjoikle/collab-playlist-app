@@ -44,7 +44,7 @@ export interface ExportPlaylistBody {
 }
 
 export interface UpdatePlaylistData {
-  playlistId: number;
+  playlistId: string;
   title: string;
   description?: string;
   isCollaborative: boolean;

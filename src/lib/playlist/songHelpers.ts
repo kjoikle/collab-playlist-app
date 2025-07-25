@@ -2,7 +2,7 @@ import type { Song, SupabaseSongCreate } from "@/types/song";
 import { createClient } from "../supabase/server";
 import { requireAuthenticatedUser } from "../supabase/authHelpers";
 
-export async function addSong(song: Song, playlistId: number) {
+export async function addSong(song: Song, playlistId: string) {
   const supabase = await createClient();
 
   const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
@@ -22,7 +22,7 @@ export async function addSong(song: Song, playlistId: number) {
     spotify_url: song.spotifyUrl,
     isrc: song.isrc,
     spotify_uri: song.spotifyUri,
-    playlist_id: playlistId,
+    playlist_id: Number(playlistId),
     user_id: userId || "",
   };
   const { data, error } = await supabase
@@ -38,7 +38,7 @@ export async function addSong(song: Song, playlistId: number) {
   return data?.id;
 }
 
-export async function deleteSong(song: Song, playlistId: number) {
+export async function deleteSong(song: Song, playlistId: string) {
   const supabase = await createClient();
 
   const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
