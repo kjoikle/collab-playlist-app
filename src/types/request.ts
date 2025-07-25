@@ -9,11 +9,11 @@ export interface UpdatePlaylistDetailsRequestBody {
 }
 
 export interface AddSongToPlaylistRequestBody {
-  playlistId: number;
+  playlistId: string;
   song: Song;
 }
 
 export interface DeleteSongFromPlaylistRequestBody {
-  playlistId: number;
+  playlistId: string;
   song: Song;
 }
