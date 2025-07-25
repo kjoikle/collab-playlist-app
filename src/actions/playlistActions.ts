@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { SupabasePlaylistWithSongs } from "@/types/playlist";
+import { supabasePlaylistWithSongsToPlaylist } from "@/lib/types/casts";
+import { Playlist, SupabasePlaylistWithSongs } from "@/types/playlist";
 import { redirect } from "next/navigation";
 
 export async function getPlaylist(playlistId: string) {
@@ -41,6 +42,10 @@ export async function getPlaylist(playlistId: string) {
     songs: songs || [],
   };
 
+  const playlistObject: Playlist = await supabasePlaylistWithSongsToPlaylist(
+    playlistWithSongs
+  );
+
   // can create a DTO to return only necessary fields
-  return playlistWithSongs;
+  return playlistObject;
 }

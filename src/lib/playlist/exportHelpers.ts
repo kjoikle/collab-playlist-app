@@ -1,19 +1,12 @@
-import type { Song } from "@/types/song";
-import type { ExportPlaylistBody } from "@/types/playlist";
+import type { ExportPlaylistBody, Playlist } from "@/types/playlist";
 
-export async function exportPlaylist(
-  songs: Song[],
-  title: string,
-  description: string,
-  collaborative: boolean,
-  isPublic: boolean
-) {
+export async function exportPlaylist(playlist: Playlist) {
   const body: ExportPlaylistBody = {
-    title: title || "New Playlist",
-    description: description || "A playlist created with Project Meow",
-    collaborative: collaborative ?? false,
-    isPublic: isPublic ?? true,
-    songUris: songs.map((song) => song.spotifyUri),
+    title: playlist.title || "New Playlist",
+    description: playlist.description || "A playlist created with Project Meow",
+    collaborative: playlist.isCollaborative ?? false,
+    isPublic: playlist.isPublic ?? true,
+    songUris: playlist.songs.map((song) => song.spotifyUri),
   };
 
   try {

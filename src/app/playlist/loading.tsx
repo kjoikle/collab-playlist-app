@@ -1,9 +1,8 @@
+import { PageLoading } from "@/components/common/PageLoading";
 import React from "react";
 
-// TODO: make pretty
-
 const PlaylistLoadingPage = () => {
-  return <div>Playlist Page Loading...</div>;
+  return <PageLoading />;
 };
 
 export default PlaylistLoadingPage;

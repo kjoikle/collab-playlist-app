@@ -1,17 +1,20 @@
+import { User } from "./user";
 import type { Song, SupabaseSong } from "./song";
 
+// Add owner property to Playlist interface
 export interface Playlist {
   id: string;
   title: string;
   description: string;
   createdAt: string;
-  userId: string;
+  owner: User;
   isCollaborative: boolean;
   isPublic: boolean;
-  songs?: Song[];
+  songs: Song[];
+  coverImage?: string;
 }
 
-export type PlaylistCreate = Omit<Playlist, "id" | "createdAt" | "userId">;
+export type PlaylistCreate = Omit<Playlist, "id" | "createdAt" | "owner">;
 
 export type SupabasePlaylist = {
   id: number;

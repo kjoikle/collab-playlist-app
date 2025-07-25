@@ -1,4 +1,8 @@
+import { User } from "./user";
+
 export type Song = {
+  id: string;
+  addedByUser: User;
   title: string;
   artist: string;
   album: string;
@@ -6,6 +10,7 @@ export type Song = {
   spotifyUrl: string;
   isrc: string;
   spotifyUri: string;
+  duration?: string; // TODO: make not optional
 };
 
 export type SupabaseSong = {
