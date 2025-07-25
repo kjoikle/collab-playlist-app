@@ -241,26 +241,34 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
             </div>
 
             {/* TODO */}
-            {/* <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
                   <AvatarImage
-                    src={playlistData.owner.avatar || "/placeholder.svg"}
-                    alt={playlistData.owner.name}
+                    src={
+                      playlistData.owner.profilePicture || "/placeholder.svg"
+                    }
+                    alt={getUserNameToDisplay(playlistData.owner)}
                   />
-                  <AvatarFallback>{playlistData.owner.name[0]}</AvatarFallback>
+                  <AvatarFallback>
+                    {getUserNameToDisplay(playlistData.owner)[0]}
+                  </AvatarFallback>
                 </Avatar>
-                <span>{playlistData.owner.name}</span>
+                <span>{getUserNameToDisplay(playlistData.owner)}</span>
               </div>
               <span>•</span>
-              <span>{playlistData.songs.length} songs</span>
+              <span>
+                {playlistData.songs.length === 1
+                  ? "1 song"
+                  : `${playlistData.songs.length} songs`}
+              </span>
               <span>•</span>
-              <span>{playlistData.totalDuration}</span>
+              <span>TODO mins</span>
               <span>•</span>
-              <span>{playlistData.likes} likes</span>
-            </div> */}
+              <span>TODO likes</span>
+            </div>
 
-            {/* {playlistData.isCollaborative &&
+            {playlistData.isCollaborative &&
               playlistData.collaborators.length > 0 && (
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium">Collaborators</h3>
@@ -270,11 +278,13 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
                       .map((collaborator) => (
                         <Avatar key={collaborator.id} className="h-8 w-8">
                           <AvatarImage
-                            src={collaborator.avatar || "/placeholder.svg"}
-                            alt={collaborator.name}
+                            src={
+                              collaborator.profilePicture || "/placeholder.svg"
+                            }
+                            alt={getUserNameToDisplay(collaborator)}
                           />
                           <AvatarFallback>
-                            {collaborator.name[0]}
+                            {getUserNameToDisplay(collaborator)[0]}
                           </AvatarFallback>
                         </Avatar>
                       ))}
@@ -293,29 +303,7 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
                     </Button>
                   </div>
                 </div>
-              )} */}
-
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={"/placeholder.svg"} />
-                  <AvatarFallback>
-                    {getUserNameToDisplay(playlistData.owner)}
-                  </AvatarFallback>
-                </Avatar>
-                <span>{getUserNameToDisplay(playlistData.owner)}</span>
-              </div>
-              <span>•</span>
-              <span>
-                {playlistData.songs.length === 1
-                  ? "1 song"
-                  : `${playlistData.songs.length} songs`}
-              </span>
-              <span>•</span>
-              <span>0:00</span>
-              <span>•</span>
-              <span>0 likes</span>
-            </div>
+              )}
 
             <div className="flex items-center gap-3">
               <Button
@@ -338,6 +326,7 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
             </div>
           </div>
         </div>
+        {/* END Playlist Info */}
 
         {/* Songs List */}
         <Card className="bg-card border-border">
