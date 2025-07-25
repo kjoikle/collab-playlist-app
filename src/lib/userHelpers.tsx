@@ -29,7 +29,6 @@ export async function getUserById(id: string): Promise<User> {
 }
 
 export function isPlaylistOwner(playlist: Playlist, user: User | null) {
-  console.log(playlist, user);
   if (!user) return false;
   return playlist.owner.id === user.id;
 }
