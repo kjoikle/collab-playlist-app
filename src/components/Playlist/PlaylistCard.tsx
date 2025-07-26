@@ -14,7 +14,7 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { Playlist } from "../../types/playlist";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
-import { getUserNameToDisplay } from "@/lib/userHelpers";
+import { getUserNameToDisplay } from "@/lib/user/userHelpers";
 
 type PlaylistCardProps = {
   playlist: Playlist;

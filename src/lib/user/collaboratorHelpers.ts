@@ -1,9 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireAuthenticatedUser } from "../supabase/authHelpers";
-import { getUserById } from "@/lib/userHelpers";
+import { getUserById, getUserIdByEmail } from "@/lib/user/userHelpers";
 import type { User } from "@/types/user";
 
-export async function getCollaborators(playlistId: string): Promise<User[]> {
+export async function getPlaylistCollaborators(
+  playlistId: string
+): Promise<User[]> {
   await requireAuthenticatedUser();
   const supabase = await createClient();
 
@@ -24,16 +26,29 @@ export async function getCollaborators(playlistId: string): Promise<User[]> {
   return users.filter(Boolean) as User[];
 }
 
-export async function addCollaborator(
+export async function addPlaylistCollaboratorByEmail(
   playlistId: string,
-  userId: string
+  userEmail: string
 ): Promise<boolean> {
-  await requireAuthenticatedUser();
+  const { user: currentUser } = await requireAuthenticatedUser();
   const supabase = await createClient();
+
+  // TODO validation:
+  // - Check if user already a collaborator ?
+
+  const collaboratorId = await getUserIdByEmail(userEmail);
+
+  if (!collaboratorId) {
+    throw new Error("User not found");
+  }
+
+  if (collaboratorId === currentUser.id) {
+    throw new Error("Cannot add yourself as a collaborator");
+  }
 
   const { error } = await supabase
     .from("playlist_collaborators")
-    .insert([{ playlist_id: playlistId, user_id: userId }]);
+    .insert([{ playlist_id: playlistId, user_id: collaboratorId }]);
 
   if (error) {
     console.error("Error adding collaborator:", error);
@@ -43,7 +58,7 @@ export async function addCollaborator(
   return true;
 }
 
-export async function removeCollaborator(
+export async function removePlaylistCollaborator(
   playlistId: string,
   userId: string
 ): Promise<boolean> {

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Song } from "@/types/song";
-import { getUserNameToDisplay } from "@/lib/userHelpers";
+import { getUserNameToDisplay } from "@/lib/user/userHelpers";
 
 interface SongCardProps {
   song: Song;

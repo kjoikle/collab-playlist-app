@@ -28,9 +28,37 @@ export async function getUserById(id: string): Promise<User> {
   };
 }
 
+/**
+ * Returns the user id for a given email, or null if not found
+ */
+export async function getUserIdByEmail(email: string): Promise<string | null> {
+  const supabase = await createClient();
+
+  const { data: collaboratorUser } = await supabase
+    .from("users")
+    .select("id")
+    .eq("email", email)
+    .single();
+
+  if (!collaboratorUser || !collaboratorUser.id) {
+    return null;
+  }
+
+  return collaboratorUser.id;
+}
+
 export function isPlaylistOwner(playlist: Playlist, user: User | null) {
   if (!user) return false;
   return playlist.owner.id === user.id;
+}
+
+export function userCanEditPlaylist(
+  playlist: Playlist,
+  user: User | null
+): boolean {
+  if (!user) return false;
+  if (isPlaylistOwner(playlist, user)) return true;
+  return playlist.collaborators.some((collab) => collab.id === user.id);
 }
 
 export function getUserNameToDisplay(user: User | null): string {

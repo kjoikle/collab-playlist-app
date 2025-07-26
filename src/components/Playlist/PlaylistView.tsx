@@ -35,14 +35,18 @@ import { Playlist } from "@/types/playlist";
 import { Song } from "@/types/song";
 import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
 import { PageLoading } from "../common/PageLoading";
-import { getUserNameToDisplay, isPlaylistOwner } from "@/lib/userHelpers";
+import {
+  getUserNameToDisplay,
+  isPlaylistOwner,
+  userCanEditPlaylist,
+} from "@/lib/user/userHelpers";
 import { useUser } from "@/context/UserContext";
 interface PlaylistViewProps {
   playlist: Playlist;
 }
 
 export function PlaylistView({ playlist }: PlaylistViewProps) {
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   const [playlistData, setPlaylistData] = useState<Playlist | null>(playlist);
   const [isAddSongOpen, setIsAddSongOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -104,12 +108,10 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
     );
   };
 
-  // const isOwner = playlistData.owner.name === "You"; // In a real app, this would check against current user
-  // const canEdit =
-  //   isOwner || playlistData.collaborators.some((c) => c.role === "editor");
-  // TODO: Implement real ownership and edit permissions
   const isOwner = playlistData ? isPlaylistOwner(playlistData, user) : false;
-  const canEdit = isOwner; // add collab logic
+  const canEdit = playlistData
+    ? userCanEditPlaylist(playlistData, user)
+    : false;
 
   // Refetch playlist from API after adding songs
   const handleSongsAdded = async () => {
@@ -123,7 +125,7 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
     }
   };
 
-  if (!playlistData || !Array.isArray(playlistData.songs)) {
+  if (!playlistData || !Array.isArray(playlistData.songs) || isLoading) {
     return <PageLoading />;
   }
 
@@ -268,51 +270,7 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
               <span>TODO likes</span>
             </div>
 
-            {playlistData.isCollaborative &&
-              playlistData.collaborators.length > 0 && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Collaborators</h3>
-                  <div className="flex items-center gap-2">
-                    {playlistData.collaborators
-                      .slice(0, 3)
-                      .map((collaborator) => (
-                        <Avatar key={collaborator.id} className="h-8 w-8">
-                          <AvatarImage
-                            src={
-                              collaborator.profilePicture || "/placeholder.svg"
-                            }
-                            alt={getUserNameToDisplay(collaborator)}
-                          />
-                          <AvatarFallback>
-                            {getUserNameToDisplay(collaborator)[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                      ))}
-                    {playlistData.collaborators.length > 3 && (
-                      <span className="text-sm text-muted-foreground">
-                        +{playlistData.collaborators.length - 3} more
-                      </span>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsCollaboratorOpen(true)}
-                      className="hover:bg-accent"
-                    >
-                      View All
-                    </Button>
-                  </div>
-                </div>
-              )}
-
             <div className="flex items-center gap-3">
-              <Button
-                size="lg"
-                className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700"
-              >
-                <Play className="mr-2 h-5 w-5" />
-                Play
-              </Button>
               {canEdit && (
                 <Button
                   variant="outline"
@@ -321,6 +279,16 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add Songs
+                </Button>
+              )}
+              {playlistData.isCollaborative && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCollaboratorOpen(true)}
+                  className="hover:bg-accent"
+                >
+                  <Users className="mr-2 h-4 w-4" />
+                  Manage Collaborators
                 </Button>
               )}
             </div>
@@ -367,12 +335,11 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
         playlist={playlistData}
         onUpdate={handleUpdatePlaylistDetails}
       />
-      {/* <CollaboratorDialog
+      <CollaboratorDialog
         open={isCollaboratorOpen}
         onOpenChange={setIsCollaboratorOpen}
         playlist={playlist}
-        onUpdate={handleUpdatePlaylist}
-      /> */}
+      />
       <SpotifyExportDialog
         open={isSpotifyExportOpen}
         onOpenChange={setIsSpotifyExportOpen}

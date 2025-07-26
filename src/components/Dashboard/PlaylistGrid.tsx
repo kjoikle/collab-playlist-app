@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Playlist } from "@/types/playlist";
 import PlaylistCard from "../Playlist/PlaylistCard";
-import { isPlaylistOwner } from "@/lib/userHelpers";
+import { isPlaylistOwner } from "@/lib/user/userHelpers";
 import { useUser } from "@/context/UserContext";
 
 interface PlaylistGridProps {
@@ -58,8 +58,7 @@ export function PlaylistGrid({
       //   return b.plays - a.plays; // TODO: Implement actual popularity logic or delete this sortOrder
       return a.title.localeCompare(b.title); // Placeholder for popularity sort
     } else if (sortOrder === "collaborators") {
-      //   return b.collaborators - a.collaborators; // TODO: Implement actual popularity logic or delete this sortOrder
-      return a.title.localeCompare(b.title); // Placeholder for collaborators sort
+      return b.collaborators.length - a.collaborators.length;
     }
     return 0;
   });
