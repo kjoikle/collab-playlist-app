@@ -1,7 +1,8 @@
-import { getUserById } from "@/lib/userHelpers";
+import { getUserById } from "@/lib/user/userHelpers";
 import { Playlist, SupabasePlaylistWithSongs } from "@/types/playlist";
 import { Song, SupabaseSong } from "@/types/song";
-import { User } from "@/types/user";
+import { SupabaseUser, User } from "@/types/user";
+import { getPlaylistCollaborators } from "../user/collaboratorHelpers";
 
 export async function supabasePlaylistWithSongsToPlaylist(
   supabasePlaylist: SupabasePlaylistWithSongs
@@ -17,6 +18,9 @@ export async function supabasePlaylistWithSongsToPlaylist(
     isPublic: supabasePlaylist.is_public,
     songs: await Promise.all(
       supabasePlaylist.songs.map((song) => supabaseSongToSong(song))
+    ),
+    collaborators: await getPlaylistCollaborators(
+      supabasePlaylist.id.toString()
     ),
   };
 }
@@ -34,6 +38,9 @@ export async function supabasePlaylistToPlaylistWithoutSongs(
     isCollaborative: supabasePlaylist.is_collaborative,
     isPublic: supabasePlaylist.is_public,
     songs: [],
+    collaborators: await getPlaylistCollaborators(
+      supabasePlaylist.id.toString()
+    ),
   };
 }
 
@@ -53,3 +60,14 @@ export async function supabaseSongToSong(
     spotifyUri: supabaseSong.spotify_uri,
   };
 }
+
+export const supabaseUserToUser = (supabaseUser: SupabaseUser): User => {
+  return {
+    id: supabaseUser.id,
+    email: supabaseUser.email,
+    displayName: supabaseUser.display_name,
+    profilePicture: supabaseUser.profile_picture,
+    createdAt: supabaseUser.created_at,
+    loginMethod: supabaseUser.login_method,
+  };
+};

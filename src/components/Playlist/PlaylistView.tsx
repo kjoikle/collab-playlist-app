@@ -34,15 +34,19 @@ import Link from "next/link";
 import { Playlist } from "@/types/playlist";
 import { Song } from "@/types/song";
 import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
-import { PageLoading } from "../common/PageLoading";
-import { getUserNameToDisplay, isPlaylistOwner } from "@/lib/userHelpers";
+import { LoadingPage } from "../common/LoadingPage";
+import {
+  getUserNameToDisplay,
+  isPlaylistOwner,
+  userCanEditPlaylist,
+} from "@/lib/user/userHelpers";
 import { useUser } from "@/context/UserContext";
 interface PlaylistViewProps {
   playlist: Playlist;
 }
 
 export function PlaylistView({ playlist }: PlaylistViewProps) {
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   const [playlistData, setPlaylistData] = useState<Playlist | null>(playlist);
   const [isAddSongOpen, setIsAddSongOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -104,12 +108,10 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
     );
   };
 
-  // const isOwner = playlistData.owner.name === "You"; // In a real app, this would check against current user
-  // const canEdit =
-  //   isOwner || playlistData.collaborators.some((c) => c.role === "editor");
-  // TODO: Implement real ownership and edit permissions
   const isOwner = playlistData ? isPlaylistOwner(playlistData, user) : false;
-  const canEdit = isOwner; // add collab logic
+  const canEdit = playlistData
+    ? userCanEditPlaylist(playlistData, user)
+    : false;
 
   // Refetch playlist from API after adding songs
   const handleSongsAdded = async () => {
@@ -123,8 +125,8 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
     }
   };
 
-  if (!playlistData || !Array.isArray(playlistData.songs)) {
-    return <PageLoading />;
+  if (!playlistData || !Array.isArray(playlistData.songs) || isLoading) {
+    return <LoadingPage />;
   }
 
   return (
@@ -240,67 +242,17 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
               </div>
             </div>
 
-            {/* TODO */}
-            {/* <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage
-                    src={playlistData.owner.avatar || "/placeholder.svg"}
-                    alt={playlistData.owner.name}
-                  />
-                  <AvatarFallback>{playlistData.owner.name[0]}</AvatarFallback>
-                </Avatar>
-                <span>{playlistData.owner.name}</span>
-              </div>
-              <span>•</span>
-              <span>{playlistData.songs.length} songs</span>
-              <span>•</span>
-              <span>{playlistData.totalDuration}</span>
-              <span>•</span>
-              <span>{playlistData.likes} likes</span>
-            </div> */}
-
-            {/* {playlistData.isCollaborative &&
-              playlistData.collaborators.length > 0 && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Collaborators</h3>
-                  <div className="flex items-center gap-2">
-                    {playlistData.collaborators
-                      .slice(0, 3)
-                      .map((collaborator) => (
-                        <Avatar key={collaborator.id} className="h-8 w-8">
-                          <AvatarImage
-                            src={collaborator.avatar || "/placeholder.svg"}
-                            alt={collaborator.name}
-                          />
-                          <AvatarFallback>
-                            {collaborator.name[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                      ))}
-                    {playlistData.collaborators.length > 3 && (
-                      <span className="text-sm text-muted-foreground">
-                        +{playlistData.collaborators.length - 3} more
-                      </span>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsCollaboratorOpen(true)}
-                      className="hover:bg-accent"
-                    >
-                      View All
-                    </Button>
-                  </div>
-                </div>
-              )} */}
-
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src={"/placeholder.svg"} />
+                  <AvatarImage
+                    src={
+                      playlistData.owner.profilePicture || "/placeholder.svg"
+                    }
+                    alt={getUserNameToDisplay(playlistData.owner)}
+                  />
                   <AvatarFallback>
-                    {getUserNameToDisplay(playlistData.owner)}
+                    {getUserNameToDisplay(playlistData.owner)[0]}
                   </AvatarFallback>
                 </Avatar>
                 <span>{getUserNameToDisplay(playlistData.owner)}</span>
@@ -312,19 +264,12 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
                   : `${playlistData.songs.length} songs`}
               </span>
               <span>•</span>
-              <span>0:00</span>
+              <span>TODO mins</span>
               <span>•</span>
-              <span>0 likes</span>
+              <span>TODO likes</span>
             </div>
 
             <div className="flex items-center gap-3">
-              <Button
-                size="lg"
-                className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700"
-              >
-                <Play className="mr-2 h-5 w-5" />
-                Play
-              </Button>
               {canEdit && (
                 <Button
                   variant="outline"
@@ -335,9 +280,20 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
                   Add Songs
                 </Button>
               )}
+              {playlistData.isCollaborative && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCollaboratorOpen(true)}
+                  className="hover:bg-accent"
+                >
+                  <Users className="mr-2 h-4 w-4" />
+                  Manage Collaborators
+                </Button>
+              )}
             </div>
           </div>
         </div>
+        {/* END Playlist Info */}
 
         {/* Songs List */}
         <Card className="bg-card border-border">
@@ -378,12 +334,11 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
         playlist={playlistData}
         onUpdate={handleUpdatePlaylistDetails}
       />
-      {/* <CollaboratorDialog
+      <CollaboratorDialog
         open={isCollaboratorOpen}
         onOpenChange={setIsCollaboratorOpen}
         playlist={playlist}
-        onUpdate={handleUpdatePlaylist}
-      /> */}
+      />
       <SpotifyExportDialog
         open={isSpotifyExportOpen}
         onOpenChange={setIsSpotifyExportOpen}

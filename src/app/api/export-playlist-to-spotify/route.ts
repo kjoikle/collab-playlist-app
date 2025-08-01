@@ -24,11 +24,7 @@ async function refreshSpotifyToken(refreshToken: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const authResult = await getAuthenticatedUserAndSession();
-  if ("error" in authResult) {
-    return NextResponse.json(authResult.error, { status: authResult.status });
-  }
-  const { user, session } = authResult;
+  const { user, session } = await getAuthenticatedUserAndSession();
 
   let accessToken = session.provider_token;
   const refreshToken = session.provider_refresh_token;

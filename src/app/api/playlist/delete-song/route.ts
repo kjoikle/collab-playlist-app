@@ -4,10 +4,7 @@ import { DeleteSongFromPlaylistRequestBody } from "@/types/request";
 import { deleteSong } from "@/lib/playlist/songHelpers";
 
 export async function POST(req: NextRequest) {
-  const authResult = await requireAuthenticatedUser(); // TODO: check they can edit
-  if ("error" in authResult) {
-    return NextResponse.json(authResult.error, { status: authResult.status });
-  }
+  await requireAuthenticatedUser();
 
   const updateData: DeleteSongFromPlaylistRequestBody = await req.json();
   try {

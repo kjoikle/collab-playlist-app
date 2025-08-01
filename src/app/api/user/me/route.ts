@@ -4,13 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { User } from "@/types/user";
 
 export async function GET(req: NextRequest) {
-  // Authenticate user
-  const authResult = await requireAuthenticatedUser();
-  if ("error" in authResult || !authResult.user) {
-    return NextResponse.json({ user: null }, { status: 401 });
-  }
+  const { user: authUser } = await requireAuthenticatedUser();
 
-  const userId = authResult.user.id;
+  const userId = authUser.id;
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("users")

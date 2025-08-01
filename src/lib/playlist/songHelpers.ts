@@ -5,12 +5,7 @@ import { requireAuthenticatedUser } from "../supabase/authHelpers";
 export async function addSong(song: Song, playlistId: string) {
   const supabase = await createClient();
 
-  const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
-  if ("error" in authResult || !authResult.user) {
-    throw new Error("Not authenticated");
-  }
-
-  const userData = authResult.user;
+  const { user: userData } = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
 
   const userId = userData?.id || null;
 
@@ -41,10 +36,7 @@ export async function addSong(song: Song, playlistId: string) {
 export async function deleteSong(song: Song, playlistId: string) {
   const supabase = await createClient();
 
-  const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
-  if ("error" in authResult || !authResult.user) {
-    throw new Error("Not authenticated");
-  }
+  await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
 
   let deleteField: string;
   let deleteValue: string | number;

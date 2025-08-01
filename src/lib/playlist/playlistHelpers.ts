@@ -1,21 +1,64 @@
 import { createClient } from "@/lib/supabase/server";
-import type { PlaylistCreate, SupabasePlaylistCreate } from "@/types/playlist";
+import type {
+  PlaylistCreate,
+  SupabasePlaylistCreate,
+  Playlist,
+  SupabasePlaylistWithSongs,
+} from "@/types/playlist";
 import type { UpdatePlaylistData } from "@/types/playlist";
 import type { Song } from "@/types/song";
 import { addSong, deleteSong } from "@/lib/playlist/songHelpers";
 import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
 import { requireAuthenticatedUser } from "../supabase/authHelpers";
+import { supabasePlaylistWithSongsToPlaylist } from "@/lib/types/casts";
+import { addPlaylistCollaboratorById } from "../user/collaboratorHelpers";
 
-export async function createPlaylist(playlistData: PlaylistCreate) {
+export async function getPlaylist(playlistId: string) {
+  await requireAuthenticatedUser(); // TODO: can see this playlist
+
   const supabase = await createClient();
 
-  // check user authentication
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData?.user) {
-    throw new Error("Not authenticated");
+  const { data, error } = await supabase
+    .from("playlists")
+    .select("*")
+    .eq("id", playlistId)
+    .single();
+
+  if (error || !data) {
+    throw new Error(
+      `Error fetching playlist: ${error?.message || "Failed to get playlist"}`
+    );
   }
 
-  const userId = userData.user.id;
+  const { data: songs, error: songsError } = await supabase
+    .from("songs")
+    .select("*")
+    .eq("playlist_id", playlistId);
+
+  if (songsError || !songs) {
+    throw new Error(
+      `Error fetching songs: ${songsError?.message || "Failed to get songs"}`
+    );
+  }
+
+  const playlistWithSongs: SupabasePlaylistWithSongs = {
+    ...data,
+    songs: songs || [],
+  };
+
+  const playlistObject: Playlist = await supabasePlaylistWithSongsToPlaylist(
+    playlistWithSongs
+  );
+
+  return playlistObject;
+}
+
+export async function createPlaylist(playlistData: PlaylistCreate) {
+  const { user } = await requireAuthenticatedUser();
+
+  const supabase = await createClient();
+
+  const userId = user.id;
 
   const newPlaylist: SupabasePlaylistCreate = {
     title: playlistData.title || "New Playlist",
@@ -45,10 +88,36 @@ export async function createPlaylist(playlistData: PlaylistCreate) {
   }
 
   const playlistId: string = data[0].id;
-  const songs = playlistData.songs || [];
+  if (!playlistId) {
+    throw new Error("Failed to create playlist, no ID returned");
+  }
 
+  // Add initial songs if provided
+  const songs = playlistData.songs || [];
   for (const song of songs) {
-    await addSong(song, playlistId);
+    try {
+      await addSong(song, playlistId);
+    } catch (err) {
+      throw new Error(
+        `Failed to add song '${song.title || song.id}': ${
+          err instanceof Error ? err.message : String(err)
+        }`
+      );
+    }
+  }
+
+  // Add initial collaborators if provided
+  const collaborators = playlistData.collaborators || [];
+  for (const collaborator of collaborators) {
+    try {
+      await addPlaylistCollaboratorById(playlistId, collaborator.id);
+    } catch (err) {
+      throw new Error(
+        `Failed to add collaborator '${
+          collaborator.email || collaborator.id
+        }': ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
   }
 
   return { success: true, playlistId: playlistId };
@@ -57,12 +126,7 @@ export async function createPlaylist(playlistData: PlaylistCreate) {
 export async function updatePlaylist(updateData: UpdatePlaylistData) {
   const supabase = await createClient();
 
-  const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
-  if ("error" in authResult) {
-    throw new Error("Not authenticated");
-  }
-
-  const userData = authResult.user;
+  const { user: userData } = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
 
   // TODO: handle collab playlists
   const { data: playlistData, error: playlistError } = await supabase
@@ -121,10 +185,7 @@ export async function updatePlaylistDetails(
 ) {
   const supabase = await createClient();
 
-  const authResult = await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
-  if ("error" in authResult) {
-    throw new Error("Not authenticated");
-  }
+  await requireAuthenticatedUser(); // TODO: check they can edit; add a param to indicate permission scope
 
   const { playlistId, title, description, isCollaborative, isPublic } =
     updateData;

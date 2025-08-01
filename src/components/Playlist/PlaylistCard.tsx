@@ -14,7 +14,7 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { Playlist } from "../../types/playlist";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
-import { getUserNameToDisplay } from "@/lib/userHelpers";
+import { getUserNameToDisplay } from "@/lib/user/userHelpers";
 
 type PlaylistCardProps = {
   playlist: Playlist;
@@ -79,15 +79,15 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
             </Avatar>
             <span className="text-xs text-muted-foreground">{userName}</span>
           </div>
-          {/* {playlist.isCollaborative && (
+          {playlist.isCollaborative && (
             <Badge
               variant="outline"
               className="gap-1 text-xs border-purple-200 text-purple-500"
             >
               <Users className="h-3 w-3" />
-              {playlist.collaborators}
+              {playlist.collaborators.length}
             </Badge>
-          )} */}
+          )}
         </CardFooter>
       </Card>
     </Link>
