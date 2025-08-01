@@ -1,8 +1,8 @@
-import { PageLoading } from "@/components/common/PageLoading";
+import { LoadingPage } from "@/components/common/LoadingPage";
 import React from "react";
 
 const LoadingDashboard = () => {
-  return <PageLoading />;
+  return <LoadingPage />;
 };
 
 export default LoadingDashboard;

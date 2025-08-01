@@ -11,6 +11,7 @@ import { addSong, deleteSong } from "@/lib/playlist/songHelpers";
 import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
 import { requireAuthenticatedUser } from "../supabase/authHelpers";
 import { supabasePlaylistWithSongsToPlaylist } from "@/lib/types/casts";
+import { addPlaylistCollaboratorById } from "../user/collaboratorHelpers";
 
 export async function getPlaylist(playlistId: string) {
   await requireAuthenticatedUser(); // TODO: can see this playlist
@@ -87,10 +88,36 @@ export async function createPlaylist(playlistData: PlaylistCreate) {
   }
 
   const playlistId: string = data[0].id;
-  const songs = playlistData.songs || [];
+  if (!playlistId) {
+    throw new Error("Failed to create playlist, no ID returned");
+  }
 
+  // Add initial songs if provided
+  const songs = playlistData.songs || [];
   for (const song of songs) {
-    await addSong(song, playlistId);
+    try {
+      await addSong(song, playlistId);
+    } catch (err) {
+      throw new Error(
+        `Failed to add song '${song.title || song.id}': ${
+          err instanceof Error ? err.message : String(err)
+        }`
+      );
+    }
+  }
+
+  // Add initial collaborators if provided
+  const collaborators = playlistData.collaborators || [];
+  for (const collaborator of collaborators) {
+    try {
+      await addPlaylistCollaboratorById(playlistId, collaborator.id);
+    } catch (err) {
+      throw new Error(
+        `Failed to add collaborator '${
+          collaborator.email || collaborator.id
+        }': ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
   }
 
   return { success: true, playlistId: playlistId };

@@ -34,7 +34,7 @@ import Link from "next/link";
 import { Playlist } from "@/types/playlist";
 import { Song } from "@/types/song";
 import { UpdatePlaylistDetailsRequestBody } from "@/types/request";
-import { PageLoading } from "../common/PageLoading";
+import { LoadingPage } from "../common/LoadingPage";
 import {
   getUserNameToDisplay,
   isPlaylistOwner,
@@ -126,7 +126,7 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
   };
 
   if (!playlistData || !Array.isArray(playlistData.songs) || isLoading) {
-    return <PageLoading />;
+    return <LoadingPage />;
   }
 
   return (
@@ -242,7 +242,6 @@ export function PlaylistView({ playlist }: PlaylistViewProps) {
               </div>
             </div>
 
-            {/* TODO */}
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">

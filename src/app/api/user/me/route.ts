@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 import { User } from "@/types/user";
 
 export async function GET(req: NextRequest) {
-  // Authenticate user
   const { user: authUser } = await requireAuthenticatedUser();
 
   const userId = authUser.id;

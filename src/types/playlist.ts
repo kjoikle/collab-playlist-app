@@ -15,10 +15,7 @@ export interface Playlist {
   collaborators: User[]; // Optional, for collaborative playlists
 }
 
-export type PlaylistCreate = Omit<
-  Playlist,
-  "id" | "createdAt" | "owner" | "collaborators"
->;
+export type PlaylistCreate = Omit<Playlist, "id" | "createdAt" | "owner">;
 
 export type SupabasePlaylist = {
   id: number;

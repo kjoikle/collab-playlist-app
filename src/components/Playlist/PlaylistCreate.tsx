@@ -18,14 +18,10 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LoadingSpinner } from "../common/LoadingSpinner";
-
-interface Collaborator {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-  role: "editor" | "viewer";
-}
+import { User } from "@/types/user";
+import { getUserNameToDisplay } from "@/lib/user/userHelpers";
+import { useUser } from "@/context/UserContext";
+import { LoadingPage } from "../common/LoadingPage";
 
 export function PlaylistCreate() {
   const router = useRouter();
@@ -34,9 +30,12 @@ export function PlaylistCreate() {
   const [isPublic, setIsPublic] = useState(true);
   const [isCollaborative, setIsCollaborative] = useState(false);
   const [coverImage, setCoverImage] = useState<string | null>(null);
-  const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+  const [collaborators, setCollaborators] = useState<User[]>([]);
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isCollaboratorLoading, setIsCollaboratorLoading] = useState(false);
+
+  const { user: currentUser, isLoading: userLoading } = useUser();
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -49,23 +48,40 @@ export function PlaylistCreate() {
     }
   };
 
-  const addCollaborator = () => {
-    if (
-      collaboratorEmail &&
-      !collaborators.find((c) => c.email === collaboratorEmail)
-    ) {
-      const newCollaborator: Collaborator = {
-        id: Date.now().toString(),
-        name: collaboratorEmail.split("@")[0],
-        email: collaboratorEmail,
-        avatar: "/placeholder.svg?height=40&width=40",
-        role: "editor",
-      };
-      setCollaborators([...collaborators, newCollaborator]);
-      setCollaboratorEmail("");
-      toast.success(
-        `${newCollaborator.name} has been added as a collaborator.`
-      );
+  const addCollaborator = async () => {
+    if (collaboratorEmail) {
+      if (collaborators.find((c) => c.email === collaboratorEmail)) {
+        toast.error("Collaborator already added");
+        return;
+      }
+
+      try {
+        setIsCollaboratorLoading(true);
+        const res = await fetch(
+          `/api/user?email=${encodeURIComponent(collaboratorEmail)}`
+        );
+        const data = await res.json();
+        const user: User = data.user;
+
+        if (!user) {
+          toast.error("User not found");
+          return;
+        }
+
+        if (user.id === currentUser?.id) {
+          toast.error("Cannot add yourself as a collaborator");
+          return;
+        }
+
+        setCollaborators([...collaborators, user]);
+        setCollaboratorEmail("");
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to add collaborator"
+        );
+      } finally {
+        setIsCollaboratorLoading(false);
+      }
     }
   };
 
@@ -73,26 +89,19 @@ export function PlaylistCreate() {
     setCollaborators(collaborators.filter((c) => c.id !== id));
   };
 
-  const toggleCollaboratorRole = (id: string) => {
-    setCollaborators(
-      collaborators.map((c) =>
-        c.id === id
-          ? { ...c, role: c.role === "editor" ? "viewer" : "editor" }
-          : c
-      )
-    );
-  };
+  // TODO: add actual roles; for now, just hardcode role as 'editor' for display
+  const toggleCollaboratorRole = (id: string) => {};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     const newPlaylist: PlaylistCreate = {
       title: title || "New Playlist",
-      description: description || "A playlist created with Project Meow",
+      description: description || "",
       isCollaborative,
       isPublic,
       songs: [],
-      // TODO: add rest of state variables
+      collaborators: collaborators,
     };
 
     try {
@@ -122,13 +131,17 @@ export function PlaylistCreate() {
     }
   };
 
+  if (userLoading) {
+    return <LoadingPage />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Top Navigation Bar */}
       <div className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-6 py-3">
           <div className="flex items-center gap-4">
-            <Link href="/">
+            <Link href="/dashboard">
               <Button variant="ghost" size="icon">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -248,7 +261,7 @@ export function PlaylistCreate() {
                         onClick={addCollaborator}
                         disabled={!collaboratorEmail}
                       >
-                        Add
+                        {isCollaboratorLoading ? <LoadingSpinner /> : "Add"}
                       </Button>
                     </div>
 
@@ -263,17 +276,20 @@ export function PlaylistCreate() {
                               <Avatar className="h-8 w-8">
                                 <AvatarImage
                                   src={
-                                    collaborator.avatar || "/placeholder.svg"
+                                    collaborator.profilePicture ||
+                                    "/placeholder.svg"
                                   }
-                                  alt={collaborator.name}
+                                  alt={getUserNameToDisplay(collaborator)}
                                 />
                                 <AvatarFallback>
-                                  {collaborator.name[0].toUpperCase()}
+                                  {getUserNameToDisplay(
+                                    collaborator
+                                  )[0].toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
                                 <p className="font-medium">
-                                  {collaborator.name}
+                                  {getUserNameToDisplay(collaborator)}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
                                   {collaborator.email}
@@ -282,17 +298,14 @@ export function PlaylistCreate() {
                             </div>
                             <div className="flex items-center gap-2">
                               <Badge
-                                variant={
-                                  collaborator.role === "editor"
-                                    ? "default"
-                                    : "secondary"
-                                }
+                                variant={"default"}
                                 className="cursor-pointer"
                                 onClick={() =>
                                   toggleCollaboratorRole(collaborator.id)
                                 }
                               >
-                                {collaborator.role}
+                                editor{" "}
+                                {/* TODO: update with role system and add a secondary variant */}
                               </Badge>
                               <Button
                                 type="button"

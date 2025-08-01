@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import { User } from "@/types/user";
 import { getUserNameToDisplay } from "@/lib/user/userHelpers";
 import { LoadingSpinner } from "../common/LoadingSpinner";
+import { removePlaylistCollaborator } from "@/lib/user/collaboratorHelpers";
 
 interface CollaboratorDialogProps {
   open: boolean;
@@ -40,7 +41,7 @@ export function CollaboratorDialog({
     setLoading(true);
 
     try {
-      const res = await fetch("/api/playlist/add-collaborator", {
+      const res = await fetch("/api/playlist/collaborator", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -65,12 +66,29 @@ export function CollaboratorDialog({
     }
   };
 
-  const removeCollaborator = (id: string) => {
-    console.log("Removing collaborator with ID:", id);
+  const removeCollaborator = async (id: string) => {
+    if (!playlist) return;
 
-    // onUpdate({
-    //   collaborators: playlist.collaborators.filter((c: any) => c.id !== id),
-    // });
+    try {
+      const res = await fetch("/api/playlist/collaborator", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          playlistId: playlist.id,
+          userId: id,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success)
+        throw new Error(data.error || "Failed to remove collaborator");
+
+      toast.success("Collaborator removed successfully");
+      window.location.reload(); // TODO: better way to refresh collaborators
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to remove collaborator"
+      );
+    }
   };
 
   const toggleRole = (id: string) => {

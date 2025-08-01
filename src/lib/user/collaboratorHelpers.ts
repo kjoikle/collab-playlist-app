@@ -26,15 +26,35 @@ export async function getPlaylistCollaborators(
   return users.filter(Boolean) as User[];
 }
 
+export async function addPlaylistCollaboratorById(
+  playlistId: string,
+  userId: string
+): Promise<boolean> {
+  const { user: currentUser } = await requireAuthenticatedUser();
+  const supabase = await createClient();
+
+  if (userId === currentUser.id) {
+    throw new Error("Cannot add yourself as a collaborator");
+  }
+
+  const { error } = await supabase
+    .from("playlist_collaborators")
+    .insert([{ playlist_id: playlistId, user_id: userId }]);
+
+  if (error) {
+    console.error("Error adding collaborator:", error);
+    throw new Error("Failed to add collaborator");
+  }
+
+  return true;
+}
+
 export async function addPlaylistCollaboratorByEmail(
   playlistId: string,
   userEmail: string
 ): Promise<boolean> {
   const { user: currentUser } = await requireAuthenticatedUser();
   const supabase = await createClient();
-
-  // TODO validation:
-  // - Check if user already a collaborator ?
 
   const collaboratorId = await getUserIdByEmail(userEmail);
 

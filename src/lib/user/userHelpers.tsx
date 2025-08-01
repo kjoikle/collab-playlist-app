@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Playlist } from "@/types/playlist";
 import { User } from "@/types/user";
+import { supabaseUserToUser } from "../types/casts";
 
 /**
  * Fetches a user from the public.users table by id.
@@ -18,14 +19,7 @@ export async function getUserById(id: string): Promise<User> {
     throw new Error(error?.message || "User not found");
   }
 
-  return {
-    id: data.id,
-    email: data.email,
-    displayName: data.display_name,
-    createdAt: data.created_at,
-    profilePicture: data.profile_picture,
-    loginMethod: data.login_method,
-  };
+  return supabaseUserToUser(data);
 }
 
 /**
@@ -45,6 +39,25 @@ export async function getUserIdByEmail(email: string): Promise<string | null> {
   }
 
   return collaboratorUser.id;
+}
+
+/**
+ * Returns the user for a given email, or throws an error
+ */
+export async function getUserByEmail(email: string): Promise<User> {
+  const supabase = await createClient();
+
+  const { data: collaboratorUser } = await supabase
+    .from("users")
+    .select("*")
+    .eq("email", email)
+    .single();
+
+  if (!collaboratorUser) {
+    throw new Error("User not found");
+  }
+
+  return supabaseUserToUser(collaboratorUser);
 }
 
 export function isPlaylistOwner(playlist: Playlist, user: User | null) {
